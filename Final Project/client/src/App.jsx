@@ -10,7 +10,6 @@ import Products from "./component/product/Products";
 import ProductDetails from "./component/product/ProductDetails";
 import "react-toastify/dist/ReactToastify.css";
 import Cart from "./component/cart/Cart";
-import Order from "./component/order/Order";
 import AddProduct from "./component/product/AddProduct";
 import ProductUpdate from "./component/product/ProductUpdate";
 import UserRegistration from "./component/user/UserRegistration";
@@ -18,13 +17,14 @@ import Login from "./component/auth/Login";
 import ProtectedRoute from "./component/auth/ProtectedRoute";
 import Unauthorized from "./component/Unauthorized";
 import UserProfile from "./component/user/UserProfile";
+import Checkout from "./component/checkout/Checkout";
 
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path='/' element={<RootLayout />}>
         <Route index element={<Home />} />
-        <Route path="/user-profile" element={<UserProfile />} />
+        <Route path='/user-profile' element={<UserProfile />} />
         <Route path='/products' element={<Products />} />
         <Route path='/products/:name' element={<Products />} />
         <Route
@@ -32,14 +32,13 @@ function App() {
           element={<Products />}
         />
 
-
-
         <Route
           path='/product/:productId/details'
           element={<ProductDetails />}
         />
         <Route path='/register' element={<UserRegistration />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/checkout/:userId/checkout' element={<Checkout />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
 
         <Route
@@ -50,8 +49,10 @@ function App() {
             />
           }>
           <Route path='/user/:userId/my-cart' element={<Cart />} />
-          <Route path='/user/:userId/my-orders' element={<Order />} />
-          <Route path='/user-profile/:userId/profile' element={<UserProfile />} />
+          <Route
+            path='/user-profile/:userId/profile'
+            element={<UserProfile />}
+          />
         </Route>
 
         <Route

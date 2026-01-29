@@ -2,6 +2,7 @@ import axios from "axios";
 import { logoutUser } from "./AuthService";
 
 const BASE_URL = "http://localhost:9090/api/v1";
+//const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const api = axios.create({
   baseURL: BASE_URL,

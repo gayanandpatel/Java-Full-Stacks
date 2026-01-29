@@ -53,7 +53,11 @@ const ProductCard = ({ products }) => {
                   </>
                 )}
 
-                <button className='shop-now-button'>Add to cart</button>
+                <Link
+                  to={`/product/${product.id}/details`}
+                  className='shop-now-button'>
+                  Add to cart
+                </Link>
               </div>
             </Card.Body>
           </Card>

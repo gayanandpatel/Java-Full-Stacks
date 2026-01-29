@@ -34,11 +34,10 @@ const authSlice = createSlice({
         localStorage.setItem("userRoles", JSON.stringify(decodedToken.roles));
         localStorage.setItem("userId", decodedToken.id);
       })
-      .addCase(login.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {        
         state.errorMessage = action.error.message;
       });
   },
 });
 
 export default authSlice.reducer;
-

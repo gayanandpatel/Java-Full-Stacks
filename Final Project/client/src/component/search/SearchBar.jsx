@@ -38,7 +38,7 @@ const SearchBar = () => {
 
   const handleClearFilters = () => {
     dispatch(clearFilters());
-    navigate("/products");
+   // navigate("/products");
   };
 
   const handleSearchQueryChange = (e) => {

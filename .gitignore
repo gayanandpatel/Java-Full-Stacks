@@ -37,3 +37,6 @@ resources/application.properties
 
 application.properties
 **/application.properties
+
+.env
+*.env

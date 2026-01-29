@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../component/services/api";
+import { api, privateApi } from "../../component/services/api";
 
 export const placeOrder = createAsyncThunk(
   "order/placeOrder",
-  async (userId) => {
+  async ({userId}) => {
+    // userId : 28
     const response = await api.post(`/orders/user/${userId}/place-order`);
-    console.log("The response from the order slice : ", response.data);
-    console.log("The response from the order slice : ", response.data.data);
     return response.data;
   }
 );
@@ -14,11 +13,20 @@ export const placeOrder = createAsyncThunk(
 export const fetchUserOrders = createAsyncThunk(
   "orders/fetchUserOrders",
   async (userId) => {
-      const response = await api.get(`/orders/user/${userId}/orders`);
-      console.log("The user orders from the slice1 : ", response);
-      console.log("The user orders from the slice2 : ", response.data);
-      console.log("The user orders from the slice3 : ", response.data.data);
+    const response = await api.get(`/orders/user/${userId}/orders`);
     return response.data.data;
+  }
+);
+
+export const createPaymentIntent = createAsyncThunk(
+  "payments/createPaymentIntent",
+  async ({ amount, currency }) => {
+    console.log("createPaymentIntent from the slice :", {amount, currency})
+    const response = await api.post("/orders/create-payment-intent", {
+      amount,
+      currency,
+    });
+    return response.data;
   }
 );
 
@@ -40,10 +48,10 @@ const orderSlice = createSlice({
         state.loading = false;
         state.successMessage = action.payload.message;
       })
-        .addCase(placeOrder.rejected, (state, action) => {
+      .addCase(placeOrder.rejected, (state, action) => {
         state.errorMessage = action.error.message;
         state.loading = false;
-      })        
+      })
       .addCase(fetchUserOrders.fulfilled, (state, action) => {
         state.orders = action.payload;
         state.loading = false;

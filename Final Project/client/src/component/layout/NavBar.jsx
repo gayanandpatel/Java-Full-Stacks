@@ -59,12 +59,6 @@ const NavBar = () => {
 
                   <NavDropdown.Divider />
 
-                  <NavDropdown.Item to={`/user/${userId}/my-orders`} as={Link}>
-                    My Orders
-                  </NavDropdown.Item>
-
-                  <NavDropdown.Divider />
-
                   <NavDropdown.Item to={"#"} onClick={handleLogout}>
                     Logout
                   </NavDropdown.Item>

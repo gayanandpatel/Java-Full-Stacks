@@ -13,6 +13,8 @@ const AddressForm = ({
   showButtons,
   showCheck,
   showTitle,
+  showAddressType,
+  showPostalCode,
 }) => {
   const dispatch = useDispatch();
   const [countries, setCountries] = useState([]);
@@ -28,30 +30,36 @@ const AddressForm = ({
   return (
     <div className='p-4 m-4 border'>
       {showTitle && <h5>{isEditing ? "Edit Address" : "Add New Address"}</h5>}
-      <Form.Group className='mb-2'>
-        <Form.Label>Street</Form.Label>
-        <Form.Control
-          type='text'
-          name='street'
-          placeholder='Street'
-          value={address.street}
-          onChange={onChange}
-        />
-      </Form.Group>
+
+      <Row>
+        <Col md={6}>
+          <Form.Group className='mb-2'>
+            <Form.Label>Street</Form.Label>
+            <Form.Control
+              type='text'
+              name='street'
+              placeholder='Street'
+              value={address.street}
+              onChange={onChange}
+            />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className='mb-2'>
+            <Form.Label>City</Form.Label>
+            <Form.Control
+              type='text'
+              name='city'
+              placeholder='City'
+              value={address.city}
+              onChange={onChange}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
 
       <Form.Group className='mb-2'>
-        <Form.Label>City</Form.Label>
-        <Form.Control
-          type='text'
-          name='city'
-          placeholder='City'
-          value={address.city}
-          onChange={onChange}
-        />
-      </Form.Group>
-
-      <Form.Group className='mb-2'>
-        <Form.Label>State</Form.Label>
+        <Form.Label>State/Province</Form.Label>
         <Form.Control
           type='text'
           name='state'
@@ -71,8 +79,8 @@ const AddressForm = ({
               onChange={onChange}>
               <option value=''>select country...</option>
               {countries.map((country, index) => (
-                <option key={index} value={country}>
-                  {country}
+                <option key={index} value={country.code}>
+                  {country.name}
                 </option>
               ))}
             </Form.Select>
@@ -92,18 +100,20 @@ const AddressForm = ({
         </Col>
       </Row>
 
-      <Form.Group className='mb-2'>
-        <Form.Label>Address Type</Form.Label>
-        <Form.Select
-          name='addressType'
-          value={address.addressType}
-          onChange={onChange}>
-          <option value=''>select address type</option>{" "}
-          <option value='HOME'>Home</option>
-          <option value='OFFICE'>Office</option>
-          <option value='SHIPPING'>Shipping</option>
-        </Form.Select>
-      </Form.Group>
+      {showAddressType && (
+        <Form.Group className='mb-2'>
+          <Form.Label>Address Type</Form.Label>
+          <Form.Select
+            name='addressType'
+            value={address.addressType}
+            onChange={onChange}>
+            <option value=''>select address type</option>{" "}
+            <option value='HOME'>Home</option>
+            <option value='OFFICE'>Office</option>
+            <option value='SHIPPING'>Shipping</option>
+          </Form.Select>
+        </Form.Group>
+      )}
 
       {showButtons && (
         <div className='d-flex gap-4 mt-3'>

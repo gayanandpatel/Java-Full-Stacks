@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api, privateApi } from "../../component/services/api";
 
-
-
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ productId, quantity }) => {
@@ -16,8 +14,9 @@ export const addToCart = createAsyncThunk(
 
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
-  async (userId) => {    
-    const response = await api.get(`/carts/user/${userId}/cart`);    
+  async (userId) => {
+    const response = await api.get(`/carts/user/${userId}/cart`);
+    console.log("The total amount 1", response.data);
     return response.data.data;
   }
 );
@@ -61,7 +60,7 @@ const cartSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.items.push(action.payload.data);
+        state.items.push(action.payload);
         state.successMessage = action.payload.message;
       })
       .addCase(addToCart.rejected, (state, action) => {
@@ -71,6 +70,7 @@ const cartSlice = createSlice({
         state.items = action.payload.items;
         state.cartId = action.payload.cartId;
         state.totalAmount = action.payload.totalAmount;
+        console.log("The total amount 2 is : ", action.payload.totalAmount);
         state.errorMessage = null;
         state.isLoading = false;
       })

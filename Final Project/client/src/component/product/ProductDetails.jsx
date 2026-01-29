@@ -12,7 +12,7 @@ import StockStatus from "../utils/StockStatus";
 const ProductDetails = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const { product, quantity } = useSelector((state) => state.product);
   const successMessage = useSelector((state) => state.cart.successMessage);
   const errorMessage = useSelector((state) => state.cart.errorMessage);
@@ -30,7 +30,7 @@ const ProductDetails = () => {
     try {
       await dispatch(addToCart({ productId, quantity })).unwrap();
       toast.success(successMessage);
-    } catch (error) {     
+    } catch (error) {
       toast.error(errorMessage);
     }
   };

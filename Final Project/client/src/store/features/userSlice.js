@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api} from "../../component/services/api";
+import { api } from "../../component/services/api";
 import axios from "axios";
 
 export const getUserById = createAsyncThunk(
   "user/getUserById",
   async (userId) => {
-    const response = await api.get(`/users/user/${userId}/user`);    
+    const response = await api.get(`/users/user/${userId}/user`);
     return response.data.data;
   }
 );
@@ -29,8 +29,11 @@ export const getCountryNames = createAsyncThunk(
   "user/getCountryNames",
   async () => {
     const response = await axios.get("https://restcountries.com/v3.1/all");
-    const countryNames = response.data.map((country) => country.name.common);
-    countryNames.sort((a, b) => a.localeCompare(b));
+    const countryNames = response.data.map((country) => ({
+      name: country.name.common,
+      code: country.cca2,
+    }));
+    countryNames.sort((a, b) => a.name.localeCompare(b.name));
     return countryNames;
   }
 );
@@ -47,7 +50,7 @@ export const addAddress = createAsyncThunk(
 // Fetch User Addresses Thunk
 export const fetchAddresses = createAsyncThunk(
   "user/fetchAddresses",
-  async (userId) => {   
+  async (userId) => {
     const response = await api.get(`/addresses/${userId}/address`);
     return response.data;
   }
@@ -65,7 +68,7 @@ export const updateAddress = createAsyncThunk(
 // Delete Address Thunk
 export const deleteAddress = createAsyncThunk(
   "user/deleteAddress",
-  async ({id}) => {
+  async ({ id }) => {
     const response = await api.delete(`/addresses/${id}/delete`);
     return response.data;
   }
@@ -106,8 +109,7 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.errorMessage = action.error.message;
         state.loading = false;
-      })
-     
+      });
   },
 });
 

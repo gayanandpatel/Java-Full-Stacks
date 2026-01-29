@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { getUserById } from "../../store/features/userSlice";
 import { toast, ToastContainer } from "react-toastify";
 import { nanoid } from "nanoid";
 
@@ -15,7 +14,9 @@ import {
   addAddress,
   deleteAddress,
   setUserAddresses,
+  getUserById,
 } from "../../store/features/userSlice";
+import LoadSpinner from "../common/LoadSpinner";
 
 const UserProfile = () => {
   const dispatch = useDispatch();
@@ -92,6 +93,7 @@ const UserProfile = () => {
   };
 
   const handleDeleteAddress = async (id) => {
+    console.log(`deleting address with ID :  ${id}`);
     const updatedAddressList = user.addressList.filter(
       (address) => address.id !== id
     );
@@ -137,13 +139,21 @@ const UserProfile = () => {
     dispatch(fetchUserOrders(userId));
   }, [dispatch, userId]);
 
+  if (loading) {
+    return (
+      <div>
+        <LoadSpinner />
+      </div>
+    );
+  }
+
   return (
     <Container className='mt-5 mb-5'>
       <ToastContainer />
       <h2 className='cart-title'>User Dashboard</h2>
       {user ? (
         <>
-          <Row>
+          <Row className='mb-4'>
             <Col md={4}>
               <Card>
                 <Card.Header>Personal User Information</Card.Header>
@@ -241,6 +251,7 @@ const UserProfile = () => {
                     showButtons={true}
                     showCheck={true}
                     showTitle={true}
+                    showAddressType={true}
                   />
                 )}
               </Card>
@@ -261,7 +272,7 @@ const UserProfile = () => {
                           <th>Order ID</th>
                           <th>Date</th>
                           <th>Total Amount</th>
-                          <th>Status</th>
+                          <th>Order Status</th>
                           <th>Items</th>
                         </tr>
                       </thead>
@@ -270,14 +281,14 @@ const UserProfile = () => {
                           orders.map((order, index) => {
                             return (
                               <tr key={index}>
-                                <td>{order.id}</td>
+                                <td>{order?.id}</td>
                                 <td>
                                   {new Date(
-                                    order.orderDate
+                                    order?.orderDate
                                   ).toLocaleDateString()}
                                 </td>
-                                <td>${order.totalAmount?.toFixed(2)}</td>
-                                <td>{order.status}</td>
+                                <td>${order?.totalAmount?.toFixed(2)}</td>
+                                <td>{order?.orderStatus}</td>
                                 <td>
                                   <Table size='sm' striped bordered hover>
                                     <thead>
@@ -291,8 +302,8 @@ const UserProfile = () => {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {Array.isArray(order.items) &&
-                                        order.items.map((item, itemIndex) => (
+                                      {Array.isArray(order?.items) &&
+                                        order?.items.map((item, itemIndex) => (
                                           <tr key={itemIndex}>
                                             <td>{item.productId}</td>
                                             <td>{item.productName}</td>

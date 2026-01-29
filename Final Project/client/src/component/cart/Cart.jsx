@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCart,
@@ -12,15 +12,16 @@ import ProductImage from "../utils/ProductImage";
 import QuantityUpdater from "../utils/QuantityUpdater";
 import LoadSpinner from "../common/LoadSpinner";
 import { toast, ToastContainer } from "react-toastify";
-import { placeOrder } from "../../store/features/orderSlice";
+
 
 const Cart = () => {
   const { userId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
   const cartId = useSelector((state) => state.cart.cartId);
   const isLoading = useSelector((state) => state.cart.isLoading);
-  const {successMessage , errorMessage} = useSelector((state) => state.order);
+  const { successMessage, errorMessage } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(getUserCart(userId));
@@ -62,19 +63,11 @@ const Cart = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (cart.items.length > 0) {
-      try {
-        const result = await dispatch(placeOrder(userId)).unwrap();
-        dispatch(clearCart());
-        toast.success(result.message);
-      } catch (error) {      
-        toast.error(error.message);
-       
-      }
-    } else {
-      toast.error("Cannot place order on empty cart");
-    }
+   navigate(`/checkout/${userId}/checkout`)
   };
+
+
+  
 
   if (isLoading) {
     return <LoadSpinner />;
@@ -85,7 +78,10 @@ const Cart = () => {
       <ToastContainer />
 
       {cart.items.length === 0 ? (
-        <h3 className='mb-4 cart-title'>Your cart is empty</h3>
+        <>
+          <h3 className='mb-4 cart-title'>Your cart is empty</h3>
+          <Link to={"/products"}>Continue Shopping</Link>
+        </>
       ) : (
         <div className='d-flex flex-column'>
           <div className='d-flex justify-content-between mb-4 fw-bold'>
@@ -107,17 +103,17 @@ const Cart = () => {
                 <div className='d-flex align-items-center'>
                   <Link to={"#"}>
                     <div className='cart-image-container'>
-                      {item.product.images.length > 0 && (
-                        <ProductImage productId={item.product.images[0].id} />
+                      {item.product?.images?.length > 0 && (
+                        <ProductImage productId={item.product?.images[0].id} />
                       )}
                     </div>
                   </Link>
                 </div>
 
-                <div className='text-center'>{item.product.name}</div>
-                <div className='text-center'>{item.product.brand}</div>
+                <div className='text-center'>{item.product?.name}</div>
+                <div className='text-center'>{item.product?.brand}</div>
                 <div className='text-center'>
-                  ${item.product.price.toFixed(2)}
+                  ${item.product?.price?.toFixed(2)}
                 </div>
                 <div className='text-center'>
                   <QuantityUpdater
@@ -126,7 +122,9 @@ const Cart = () => {
                     onIncrease={() => handleIncreaseQuantity(item.product.id)}
                   />
                 </div>
-                <div className='text-center'>${item.totalPrice.toFixed(2)}</div>
+                <div className='text-center'>
+                  ${item.totalPrice?.toFixed(2)}
+                </div>
                 <div>
                   <Link
                     to={"#"}
@@ -142,17 +140,14 @@ const Cart = () => {
 
           <div className='cart-footer d-flex align-items-center mt-4'>
             <h4 className='mb-0 cart-title'>
-              Total Cart Amount: ${cart.totalAmount.toFixed(2)}
+              Total Cart Amount: ${cart.totalAmount?.toFixed(2)}
             </h4>
             <div className='ms-auto checkout-links'>
-                <Link to={"/products"}>Continue Shopping</Link>
-                
-                
+              <Link to={"/products"}>Continue Shopping</Link>
+
               <Link to={"#"} onClick={handlePlaceOrder}>
                 Proceed to Checkout
-                </Link>
-                
-
+              </Link>
             </div>
           </div>
         </div>
