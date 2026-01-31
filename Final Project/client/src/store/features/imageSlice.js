@@ -1,62 +1,146 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
 
+// --- Async Thunks ---
+
+// Upload Images
 export const uploadImages = createAsyncThunk(
   "image/uploadImages",
-  async ({ productId, files }) => {
-    const formData = new FormData();
-    if (Array.isArray(files)) {
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
-    } else {
-      formData.append("files", files);
-    }
+  async ({ productId, files }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      if (Array.isArray(files)) {
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+      } else {
+        formData.append("files", files);
+      }
+      formData.append("productId", productId);
 
-    formData.append("productId", productId);
-    const response = await api.post("/images/upload", formData);
-    return response.data;
+      const response = await api.post("/images/upload", formData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to upload images"
+      );
+    }
   }
 );
 
+// Update Product Image
 export const updateProductImage = createAsyncThunk(
   "image/updateProductImage",
-  async ({ imageId, file }) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await api.put(`/images/image/${imageId}/update`, formData);
-    return response.data;
+  async ({ imageId, file }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await api.put(`/images/image/${imageId}/update`, formData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to update image"
+      );
+    }
   }
 );
 
+// Delete Product Image
 export const deleteProductImage = createAsyncThunk(
   "image/deleteProductImage",
-  async ({ imageId }) => {
-    const response = await api.delete(`/images/image/${imageId}/delete`);
-    return response.data;
+  async ({ imageId }, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/images/image/${imageId}/delete`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to delete image"
+      );
+    }
   }
 );
 
+// --- Slice ---
+
 const initialState = {
-  uploadedImages: [],
+  uploadedImages: [], // Used to trigger UI updates/refetches in components
+  isLoading: false,
+  error: null,
+  successMessage: null,
 };
 
 const imageSlice = createSlice({
   name: "image",
   initialState,
-  reducers: {},
+  reducers: {
+    clearImageError: (state) => {
+      state.error = null;
+    },
+    clearImageSuccess: (state) => {
+      state.successMessage = null;
+    },
+    resetImageState: (state) => {
+      state.uploadedImages = [];
+      state.isLoading = false;
+      state.error = null;
+      state.successMessage = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
+      // Upload Images
+      .addCase(uploadImages.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
       .addCase(uploadImages.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.uploadedImages = [
           ...state.uploadedImages,
           ...action.payload.data,
         ];
+        state.successMessage = "Images uploaded successfully";
+      })
+      .addCase(uploadImages.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Update Product Image
+      .addCase(updateProductImage.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.successMessage = null;
       })
       .addCase(updateProductImage.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Append updated image to trigger re-render in consuming components
         state.uploadedImages = [...state.uploadedImages, action.payload.data];
+        state.successMessage = "Image updated successfully";
+      })
+      .addCase(updateProductImage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Delete Product Image
+      .addCase(deleteProductImage.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(deleteProductImage.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successMessage = action.payload?.message || "Image deleted successfully";
+      })
+      .addCase(deleteProductImage.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
+
+export const { clearImageError, clearImageSuccess, resetImageState } = imageSlice.actions;
 
 export default imageSlice.reducer;
