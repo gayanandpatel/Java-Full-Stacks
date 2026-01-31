@@ -1,0 +1,152 @@
+/* Login.module.css */
+.loginContainer {
+  min-height: 80vh; /* Takes up most of the screen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa; /* Light background for contrast against the dark card, or use a dark bg image */
+  padding: 40px 20px;
+}
+
+.loginCard {
+  background: #ffffff;
+  width: 100%;
+  max-width: 450px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.loginCard:hover {
+  transform: translateY(-5px);
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 15px;
+  color: #999;
+  font-size: 1.1rem;
+  z-index: 1;
+  transition: color 0.3s;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 15px 12px 45px; /* Left padding creates space for the icon */
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+}
+
+.input:focus {
+  border-color: var(--search-button-color, #c38212);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(195, 130, 18, 0.1);
+}
+
+.input:focus + .icon, /* If icon was after input */
+.inputWrapper:focus-within .icon {
+  color: var(--search-button-color, #c38212);
+}
+
+.errorText {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submitBtn:hover {
+  background-color: var(--search-button-color, #c38212);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(195, 130, 18, 0.3);
+}
+
+.registerLink {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.link {
+  color: var(--search-button-color, #c38212);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+/* Error Banner inside card */
+.authError {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid #ffcdd2;
+}
+
+@media (max-width: 576px) {
+  .loginCard {
+    padding: 30px 20px;
+    box-shadow: none; /* Flatter on mobile */
+    background: transparent;
+  }
+  .loginContainer {
+    background: #fff;
+    align-items: flex-start;
+  }
+}

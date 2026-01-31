@@ -1,0 +1,121 @@
+/* Hero.module.css */
+.heroContainer {
+  position: relative;
+  width: 100%;
+  height: 600px; /* Taller, more cinematic height */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sliderWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Gradient overlay to ensure text readability over any image */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  z-index: 1;
+  pointer-events: none;
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.glassCard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  color: #fff;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.brandHighlight {
+  color: var(--search-button-color, #c38212);
+}
+
+.searchContainer {
+  margin: 2rem 0;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 1.5rem;
+}
+
+.primaryBtn, .secondaryBtn {
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.primaryBtn {
+  background-color: var(--search-button-color, #c38212);
+  color: white;
+  border: none;
+}
+
+.primaryBtn:hover {
+  background-color: #a86e0d;
+  transform: translateY(-2px);
+}
+
+.secondaryBtn {
+  background-color: transparent;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.5);
+}
+
+.secondaryBtn:hover {
+  border-color: #fff;
+  background-color: rgba(255,255,255,0.1);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .heroContainer {
+    height: 500px;
+  }
+  .glassCard {
+    padding: 2rem 1.5rem;
+    width: 90%;
+    margin: 0 auto;
+  }
+  .title {
+    font-size: 2rem;
+  }
+}

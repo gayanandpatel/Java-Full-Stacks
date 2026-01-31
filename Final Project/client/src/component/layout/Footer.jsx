@@ -1,68 +1,136 @@
 import React, { useEffect } from "react";
-import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { getAllCategories } from "../../store/features/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
+import { getAllCategories } from "../../store/features/categorySlice";
+
+// Icons
+import { 
+  FaFacebookF, 
+  FaTwitter, 
+  FaInstagram, 
+  FaLinkedinIn, 
+  FaMapMarkerAlt, 
+  FaPhoneAlt, 
+  FaEnvelope,
+  FaCcVisa,
+  FaCcMastercard,
+  FaCcPaypal
+} from "react-icons/fa";
+
+// Import the CSS Module
+import styles from "./Footer.module.css";
 
 const Footer = () => {
   const dispatch = useDispatch();
-  const categories = useSelector((state) => state.category.categories);
+  // Safe access to categories in case state is empty initially
+  const categories = useSelector((state) => state.category.categories) || [];
 
   useEffect(() => {
     dispatch(getAllCategories());
   }, [dispatch]);
 
+  // Limit categories to 5 to prevent the footer from getting too long vertically
+  const displayedCategories = categories.slice(0, 5);
+
   return (
-    <footer className='mega-footer'>
-      <div className='footer-container'>
-        <div className='footer-section'>
-          <h3>About Us</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    <footer className={styles.footer}>
+      
+      {/* 1. Newsletter Section - Modern Touch */}
+      <div className={styles.newsletterSection}>
+        <div className={styles.newsletterContent}>
+          <div className={styles.newsletterText}>
+            <h3>Join our newsletter</h3>
+            <p>We'll send you a nice letter once per week. No spam.</p>
+          </div>
+          <form className={styles.newsletterForm} onSubmit={(e) => e.preventDefault()}>
+            <input 
+              type="email" 
+              placeholder="Enter your email" 
+              className={styles.input} 
+            />
+            <button type="submit" className={styles.subscribeBtn}>
+              Subscribe
+            </button>
+          </form>
         </div>
+      </div>
 
-        <div className='footer-section'>
-          <h3>Category</h3>
-          <ul>
-            {categories.map((category, index) => (
-              <li key={index}>
-                <Link to={`/products/category/${category.id}/products`}>{category.name}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className='footer-section'>
-          <h3>Contact</h3>
-          <p>Email: info@buynow.com</p>
-          <p>Phone: (123) 456-7890</p>
-        </div>
-
-        <div className='footer-section'>
-          <h3>Follow Us</h3>
-          <div className='social-icons'>
-            <a
-              href='https://facebook.com'
-              target='_blank'
-              rel='noopener noreferrer'>
-              <FaFacebookF />
-            </a>
-            <a
-              href='https://twitter.com'
-              target='_blank'
-              rel='noopener noreferrer'>
-              <FaTwitter />
-            </a>
-            <a
-              href='https://instagram.com'
-              target='_blank'
-              rel='noopener noreferrer'>
-              <FaInstagram />
-            </a>
+      {/* 2. Main Grid Layout */}
+      <div className={styles.mainContent}>
+        
+        {/* Brand Column */}
+        <div className={styles.column}>
+          <h4 style={{ fontSize: '1.5rem', color: '#fff' }}>Shopifyy</h4>
+          <p className={styles.brandDesc}>
+            Your one-stop destination for premium products. We pride ourselves on 
+            quality, transparency, and speed.
+          </p>
+          <div className={styles.socialIcons}>
+            <a href="#" className={styles.iconLink}><FaFacebookF /></a>
+            <a href="#" className={styles.iconLink}><FaTwitter /></a>
+            <a href="#" className={styles.iconLink}><FaInstagram /></a>
+            <a href="#" className={styles.iconLink}><FaLinkedinIn /></a>
           </div>
         </div>
 
-        <div className='footer-bottom'>
-          <p>&copy; 2024 buynow.com. All rights reserved.</p>
+        {/* Quick Links */}
+        <div className={styles.column}>
+          <h4>Company</h4>
+          <ul className={styles.linkList}>
+            <li><Link to="/about" className={styles.link}>About Us</Link></li>
+            <li><Link to="/careers" className={styles.link}>Careers</Link></li>
+            <li><Link to="/blog" className={styles.link}>Our Blog</Link></li>
+            <li><Link to="/terms" className={styles.link}>Terms & Service</Link></li>
+          </ul>
+        </div>
+
+        {/* Dynamic Categories */}
+        <div className={styles.column}>
+          <h4>Shop</h4>
+          <ul className={styles.linkList}>
+            {displayedCategories.map((category) => (
+              <li key={category.id}>
+                <Link 
+                  to={`/products/category/${category.id}/products`} 
+                  className={styles.link}
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
+            <li><Link to="/products" className={styles.link}>All Products</Link></li>
+          </ul>
+        </div>
+
+        {/* Contact Info */}
+        <div className={styles.column}>
+          <h4>Contact Us</h4>
+          <div className={styles.contactItem}>
+            <FaMapMarkerAlt style={{ color: 'var(--search-button-color, #c38212)' }} />
+            <span>123 Commerce St, Bengaluru, India</span>
+          </div>
+          <div className={styles.contactItem}>
+            <FaPhoneAlt style={{ color: 'var(--search-button-color, #c38212)' }} />
+            <span>(123) 456-7890</span>
+          </div>
+          <div className={styles.contactItem}>
+            <FaEnvelope style={{ color: 'var(--search-button-color, #c38212)' }} />
+            <span>support@shopifyy.com</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Bottom Bar with Payment Icons */}
+      <div className={styles.bottomBar}>
+        <div className={styles.bottomContent}>
+          <p className={styles.copyright}>
+            &copy; {new Date().getFullYear()} Shopifyy. All rights reserved.
+          </p>
+          <div className={styles.paymentMethods}>
+             <FaCcVisa className={styles.paymentIcon} />
+             <FaCcMastercard className={styles.paymentIcon} />
+             <FaCcPaypal className={styles.paymentIcon} />
+          </div>
         </div>
       </div>
     </footer>

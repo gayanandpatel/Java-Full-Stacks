@@ -1,32 +1,37 @@
 import React, { useEffect, useState } from "react";
-import Hero from "../hero/Hero";
-import Paginator from "../common/Paginator";
-import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import ProductImage from "../utils/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
-import { setTotalItems } from "../../store/features/paginationSlice";
-import { getDistinctProductsByName } from "../../store/features/productSlice";
+
+// Components
+import Hero from "../hero/Hero";
+import Paginator from "../common/Paginator";
+import ProductImage from "../utils/ProductImage";
 import LoadSpinner from "../common/LoadSpinner";
 import StockStatus from "../utils/StockStatus";
+
+// State Actions
+import { setTotalItems } from "../../store/features/paginationSlice";
+import { getDistinctProductsByName } from "../../store/features/productSlice";
+
+// Styling
+import styles from "./Home.module.css";
 
 const Home = () => {
   const dispatch = useDispatch();
   const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  // Redux Selectors
   const products = useSelector((state) => state.product.distinctProducts);
-  const { searchQuery, selectedCategory } = useSelector(
-    (state) => state.search
-  );
-  const { itemsPerPage, currentPage } = useSelector(
-    (state) => state.pagination
-  );
+  const { searchQuery, selectedCategory } = useSelector((state) => state.search);
+  const { itemsPerPage, currentPage } = useSelector((state) => state.pagination);
   const isLoading = useSelector((state) => state.product.isLoading);
 
   useEffect(() => {
     dispatch(getDistinctProductsByName());
   }, [dispatch]);
 
+  // Filtering Logic
   useEffect(() => {
     const results = products.filter((product) => {
       const matchesQuery = product.name
@@ -43,6 +48,7 @@ const Home = () => {
     setFilteredProducts(results);
   }, [searchQuery, selectedCategory, products]);
 
+  // Pagination Logic
   useEffect(() => {
     dispatch(setTotalItems(filteredProducts.length));
   }, [filteredProducts, dispatch]);
@@ -55,46 +61,64 @@ const Home = () => {
   );
 
   if (isLoading) {
-    return (
-      <div>
-        <LoadSpinner />
-      </div>
-    );
+    return <LoadSpinner />;
   }
 
   return (
     <>
       <Hero />
-      <div className='d-flex flex-wrap justify-content-center p-5'>
+      
+      <div className={styles.container}>
         <ToastContainer />
-        {currentProducts &&
-          currentProducts.map((product) => (
-            <Card key={product.id} className='home-product-card'>
-              <Link to={`/products/${product.name}`} className='link'>
-                <div className='image-container'>
-                  {product.images.length > 0 && (
+        
+        {currentProducts.length === 0 ? (
+          <div className="text-center mt-5">
+             <h3>No products found.</h3>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {currentProducts.map((product) => (
+              <div key={product.id} className={styles.card}>
+                
+                {/* Image Section */}
+                <Link to={`/products/${product.name}`} className={styles.imageWrapper}>
+                  {product.images.length > 0 ? (
+                     // Assuming ProductImage renders an <img> tag, the CSS will handle it
                     <ProductImage productId={product.images[0].id} />
+                  ) : (
+                    <div className="text-muted">No Image</div>
                   )}
-                </div>
-              </Link>
-
-              <Card.Body>
-                <p className='product-description'>
-                  {product.name} - {product.description}
-                </p>
-                <h4 className='price'>{product.price}</h4>
-
-                <StockStatus inventory={product.inventory} />
-
-                <Link
-                  to={`/products/${product.name}`}
-                  className='shop-now-button'>
-                  {" "}
-                  Shop now
                 </Link>
-              </Card.Body>
-            </Card>
-          ))}
+
+                {/* Details Section */}
+                <div className={styles.cardBody}>
+                  <div>
+                    <Link to={`/products/${product.name}`} className={styles.productName}>
+                      {product.name}
+                    </Link>
+                    <p className={styles.productDesc}>
+                      {product.description}
+                    </p>
+                    <div className={styles.stockStatus}>
+                        <StockStatus inventory={product.inventory} />
+                    </div>
+                  </div>
+
+                  {/* Footer (Price & Action) */}
+                  <div className={styles.cardFooter}>
+                    <span className={styles.price}>${product.price}</span>
+                    <Link
+                      to={`/products/${product.name}`}
+                      className={styles.shopBtn}
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <Paginator />

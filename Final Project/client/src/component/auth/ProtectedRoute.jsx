@@ -4,16 +4,20 @@ import { useLocation, Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({ children, allowedRoles = [], useOutlet = false }) => {
   const location = useLocation();
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const userRoles = useSelector((state) => state.auth.roles);
+  const { isAuthenticated, roles } = useSelector((state) => state.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to='/login' state={{ from: location }} replace />;
+    // Redirect them to the login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience.
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const userRolesLower = userRoles.map((role) => role.toLowerCase());
+  // Normalize roles to lowercase for safe comparison
+  const userRolesLower = roles.map((role) => role.toLowerCase());
   const allowedRolesLower = allowedRoles.map((role) => role.toLowerCase());
 
+  // Check if user has at least one of the allowed roles
   const isAuthorized = userRolesLower.some((userRole) =>
     allowedRolesLower.includes(userRole)
   );
@@ -21,7 +25,8 @@ const ProtectedRoute = ({ children, allowedRoles = [], useOutlet = false }) => {
   if (isAuthorized) {
     return useOutlet ? <Outlet /> : children;
   } else {
-    return <Navigate to='/unauthorized' state={{ from: location }} replace />;
+    // User is logged in but doesn't have permission
+    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 };
 

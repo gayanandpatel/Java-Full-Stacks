@@ -1,0 +1,223 @@
+/* Footer.module.css */
+
+.footer {
+  background-color: #111111; /* Darker, more premium background */
+  color: #b0b0b0; /* Softer white for text prevents eye strain */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding-top: 4rem;
+  margin-top: auto; /* Pushes footer to bottom if page content is short */
+}
+
+/* --- Top Newsletter Section --- */
+.newsletterSection {
+  border-bottom: 1px solid #333;
+  padding-bottom: 3rem;
+  margin-bottom: 3rem;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.newsletterContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.newsletterText h3 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.newsletterText p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.newsletterForm {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  max-width: 500px;
+}
+
+.input {
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background-color: #222;
+  color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  border-color: var(--search-button-color, #c38212);
+}
+
+.subscribeBtn {
+  padding: 12px 24px;
+  background-color: var(--search-button-color, #c38212);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.subscribeBtn:hover {
+  opacity: 0.9;
+}
+
+/* --- Main Grid Section --- */
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr; /* Logo section is wider */
+  gap: 40px;
+  padding: 0 5% 3rem 5%;
+}
+
+.column h4 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.brandDesc {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 300px;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 15px;
+}
+
+.iconLink {
+  color: white;
+  background-color: #222;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.iconLink:hover {
+  background-color: var(--search-button-color, #c38212);
+  transform: translateY(-3px);
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.linkList li {
+  margin-bottom: 12px;
+}
+
+.link {
+  color: #b0b0b0;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 0.95rem;
+}
+
+.link:hover {
+  color: var(--search-button-color, #c38212);
+  padding-left: 5px; /* Subtle movement effect */
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* --- Bottom Bar --- */
+.bottomBar {
+  background-color: #000;
+  padding: 1.5rem 5%;
+  border-top: 1px solid #222;
+}
+
+.bottomContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.copyright {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.paymentMethods {
+  display: flex;
+  gap: 10px;
+  opacity: 0.7;
+}
+
+.paymentIcon {
+  font-size: 24px;
+  color: #fff;
+}
+
+/* --- Responsive --- */
+@media (max-width: 992px) {
+  .mainContent {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .newsletterContent {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .newsletterForm {
+    width: 100%;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .brandDesc {
+    margin: 0 auto 1.5rem auto;
+  }
+
+  .socialIcons {
+    justify-content: center;
+  }
+  
+  .contactItem {
+    justify-content: center;
+  }
+
+  .bottomContent {
+    flex-direction: column;
+    text-align: center;
+  }
+}

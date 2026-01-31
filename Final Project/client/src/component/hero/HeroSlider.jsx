@@ -12,18 +12,39 @@ const images = [bg1, bg2, bg3, bg5];
 const HeroSlider = () => {
   const settings = {
     infinite: true,
-    speed: 12000,
+    speed: 1000, 
     autoplay: true,
-    autoplayspeed: 15000,
+    autoplaySpeed: 5000, // Fixed naming convention (camelCase)
+    fade: true, // Adds a smoother cross-fade effect
+    arrows: false,
+    dots: false,
   };
+
+  const imageStyle = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    position: "absolute",
+    top: 0,
+    left: 0
+  };
+
   return (
-    <Slider {...settings} className='hero-slider'>
-      {images.map((img, index) => (
-        <div key={index} className='slide'>
-          <img src={img} alt={`Slide ${index + 1}`} className='slide-image' />
-        </div>
-      ))}
-    </Slider>
+    <div style={{ width: "100%", height: "100%" }}>
+      <Slider {...settings} style={{ height: "100%" }}>
+        {images.map((img, index) => (
+          <div key={index} style={{ height: "100%" }}>
+            {/* Using inline styles here ensures the background cover works perfectly */}
+            <div style={{ 
+               height: "600px", // Match Hero container height
+               backgroundImage: `url(${img})`,
+               backgroundSize: 'cover',
+               backgroundPosition: 'center'
+            }} />
+          </div>
+        ))}
+      </Slider>
+    </div>
   );
 };
 

@@ -1,95 +1,157 @@
-import React, { useEffect } from "react";
-import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserCart } from "../../store/features/cartSlice";
 import { logoutUser } from "../services/AuthService";
 
+// Icons
+import { FaShoppingCart, FaUser, FaChevronDown } from "react-icons/fa";
+
+// Styles
+import styles from "./NavBar.module.css";
+
 const NavBar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  // State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Redux
   const userRoles = useSelector((state) => state.auth.roles);
   const userId = localStorage.getItem("userId");
   const cart = useSelector((state) => state.cart);
 
-  const handleLogout = () => {
-    logoutUser();
-  };
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
+  // Fetch Cart
   useEffect(() => {
     if (userId) {
       dispatch(getUserCart(userId));
     }
   }, [dispatch, userId]);
 
+  const handleLogout = () => {
+    logoutUser();
+    setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+    // Optional: Refresh or navigate to login
+    navigate("/login");
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <Navbar expand='lg' sticky='top' className='nav-bg'>
-      <Container>
-        <Navbar.Brand to={"/"} as={Link}>
-          <span className='shop-home'>buyNow.com</span>
-        </Navbar.Brand>
+    <nav className={styles.navbar}>
+      <div className={styles.container}>
+        
+        {/* 1. Brand Logo */}
+        <Link to="/" className={styles.brand}>
+          Shop<span className={styles.brandHighlight}>ifyy</span>
+        </Link>
 
-        <Navbar.Toggle />
-
-        <Navbar.Collapse>
-          <Nav className='me-auto'>
-            <Nav.Link to={"/products"} as={Link}>
+        {/* 2. Navigation Links (Desktop + Mobile) */}
+        <ul className={`${styles.navLinks} ${isMobileMenuOpen ? styles.navActive : ""}`}>
+          <li className={styles.navItem}>
+            <Link to="/products" className={styles.navLink} onClick={() => setIsMobileMenuOpen(false)}>
               All Products
-            </Nav.Link>
-          </Nav>
-
+            </Link>
+          </li>
+          
           {userRoles.includes("ROLE_ADMIN") && (
-            <Nav className='me-auto'>
-              <Nav.Link to={"/add-product"} as={Link}>
+            <li className={styles.navItem}>
+              <Link to="/add-product" className={styles.navLink} onClick={() => setIsMobileMenuOpen(false)}>
                 Manage Shop
-              </Nav.Link>
-            </Nav>
+              </Link>
+            </li>
           )}
 
-          <Nav className='ms-auto'>
-            <NavDropdown title='Account'>
-              {userId ? (
-                <>
-                  <NavDropdown.Item
-                    to={`/user-profile/${userId}/profile`}
-                    as={Link}>
-                    My Account
-                  </NavDropdown.Item>
+          {/* Mobile Only: Login link if not logged in (to save space on desktop) */}
+          {isMobileMenuOpen && !userId && (
+             <li className={styles.navItem}>
+               <Link to="/login" className={styles.navLink} onClick={() => setIsMobileMenuOpen(false)}>
+                 Register/Login
+               </Link>
+             </li>
+          )}
+        </ul>
 
-                  <NavDropdown.Divider />
-
-                  <NavDropdown.Item to={"#"} onClick={handleLogout}>
-                    Logout
-                  </NavDropdown.Item>
-                </>
-              ) : (
-                <>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item to={"/login"} as={Link}>
-                    Login
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                </>
+        {/* 3. Right Side Actions */}
+        <div className={styles.navActions}>
+          
+          {/* Cart Icon */}
+          {userId && (
+            <Link to={`/user/${userId}/my-cart`} className={styles.cartContainer}>
+              <FaShoppingCart />
+              {cart.items.length > 0 && (
+                <span className={styles.cartBadge}>{cart.items.length}</span>
               )}
-            </NavDropdown>
+            </Link>
+          )}
 
-            {userId && (
-              <Link
-                to={`/user/${userId}/my-cart`}
-                className='nav-link me-1 position-relative'>
-                <FaShoppingCart className='shopping-cart-icon' />
-                {cart.items.length > 0 ? (
-                  <div className='badge-overlay'>{cart.items.length}</div>
-                ) : (
-                  <div className='badge-overlay'>0</div>
-                )}
+          {/* User Account Dropdown (Desktop) */}
+          {userId ? (
+            <div className={styles.profileDropdown} ref={dropdownRef}>
+              <div 
+                className={styles.profileTrigger} 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <FaUser className={styles.userIcon} />
+                <FaChevronDown className={`${styles.chevron} ${isDropdownOpen ? styles.rotate : ''}`} />
+              </div>
+
+              <div className={`${styles.dropdownMenu} ${isDropdownOpen ? styles.showDropdown : ''}`}>
+                <Link 
+                  to={`/user-profile/${userId}/profile`} 
+                  className={styles.dropdownItem}
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  My Profile
+                </Link>
+                <div className={styles.divider}></div>
+                <div 
+                  className={styles.dropdownItem} 
+                  onClick={handleLogout}
+                >
+                  Logout
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Login Button (Desktop) - hidden on mobile via CSS if needed, 
+               but here we keep it simple. Only shows if menu closed to avoid duplicates */
+            !isMobileMenuOpen && (
+              <Link to="/login" className={styles.navLink} style={{marginRight: '10px'}}>
+                Register/Login
               </Link>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+            )
+          )}
+
+          {/* Mobile Menu Toggle (Hamburger) */}
+          <div 
+            className={`${styles.mobileToggle} ${isMobileMenuOpen ? styles.open : ""}`} 
+            onClick={toggleMobileMenu}
+          >
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 

@@ -2,29 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../store/features/authSlice";
-import {
-  Container,
-  InputGroup,
-  Row,
-  Col,
-  Button,
-  Form,
-  Card,
-} from "react-bootstrap";
 import { BsPersonFill, BsLockFill } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
+import styles from "./Login.module.css";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
+  
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  
   const [errorMessage, setErrorMessage] = useState(null);
+  
+  // Redux state
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const authErrorMessage = useSelector((state) => state.auth.errorMessage);
+  
+  // Redirect path
   const from = location.state?.from?.pathname || "/";
 
   useEffect(() => {
@@ -40,90 +38,92 @@ const Login = () => {
       ...prevState,
       [name]: value,
     }));
+    // Clear local error when user types
+    if (errorMessage) setErrorMessage(null);
   };
 
-  const handleLogin =(e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!credentials.email || !credentials.password) {
-      toast.error("Invalid username or password");
-      setErrorMessage("Invalid username or password");
+      const msg = "Please enter both email and password";
+      toast.error(msg);
+      setErrorMessage(msg);
       return;
     }
+    
     try {
-     dispatch(login(credentials)).unwrap();
-    } catch (error) {     
-      toast.error(authErrorMessage);
+      await dispatch(login(credentials)).unwrap();
+      // Navigation is handled by the useEffect above upon success
+    } catch (error) {
+      toast.error(authErrorMessage || "Login failed");
     }
   };
 
   return (
-    <Container className='mt-5 mb-5'>
-      <ToastContainer />
-      <Row className='d-flex justify-content-center'>
-        <Col xs={12} sm={10} md={8} lg={6} xl={6}>
-          <Card>
-            <Card.Body>
-              {authErrorMessage && (
-                <div className='text-danger'>{authErrorMessage}</div>
-              )}
-              <Card.Title className='text-center mb-4'>Login</Card.Title>
+    <div className={styles.loginContainer}>
+      <ToastContainer position="top-right" autoClose={3000} />
+      
+      <div className={styles.loginCard}>
+        <h2 className={styles.title}>Welcome Back</h2>
+        
+        {authErrorMessage && (
+          <div className={styles.authError}>
+            {authErrorMessage}
+          </div>
+        )}
 
-              <Form onSubmit={handleLogin}>
-                <Form.Group className='mb-3' controlId='username'>
-                  <Form.Label>Email</Form.Label>
+        <form onSubmit={handleLogin}>
+          
+          {/* Email Field */}
+          <div className={styles.formGroup}>
+            <label htmlFor="email" className={styles.label}>Email Address</label>
+            <div className={styles.inputWrapper}>
+              <BsPersonFill className={styles.icon} />
+              <input
+                type="text"
+                id="email"
+                name="email"
+                className={styles.input}
+                placeholder="Enter your email"
+                value={credentials.email}
+                onChange={handleInputChange}
+                autoComplete="email"
+              />
+            </div>
+          </div>
 
-                  <InputGroup>
-                    <InputGroup.Text>
-                      <BsPersonFill />
-                    </InputGroup.Text>
+          {/* Password Field */}
+          <div className={styles.formGroup}>
+            <label htmlFor="password" className={styles.label}>Password</label>
+            <div className={styles.inputWrapper}>
+              <BsLockFill className={styles.icon} />
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className={styles.input}
+                placeholder="Enter your password"
+                value={credentials.password}
+                onChange={handleInputChange}
+                autoComplete="current-password"
+              />
+            </div>
+            {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
+          </div>
 
-                    <Form.Control
-                      type='text'
-                      name='email'
-                      placeholder='Enter your email address'
-                      value={credentials.email}
-                      onChange={handleInputChange}
-                      isInvalid={!!errorMessage}
-                    />
-                  </InputGroup>
-                </Form.Group>
+          <button type="submit" className={styles.submitBtn}>
+            Login
+          </button>
+        </form>
 
-                <Form.Group className='mb-3' controlId='password'>
-                  <Form.Label>Password</Form.Label>
-                  <InputGroup>
-                    <InputGroup.Text>
-                      <BsLockFill />
-                    </InputGroup.Text>
-                    <Form.Control
-                      type='password'
-                      name='password'
-                      placeholder='Enter your password'
-                      value={credentials.password}
-                      onChange={handleInputChange}
-                      isInvalid={!!errorMessage}
-                    />
-                  </InputGroup>
-                </Form.Group>
-
-                <Button
-                  variant='outline-primary'
-                  type='submit'
-                  className='w-100'>
-                  Login
-                </Button>
-              </Form>
-
-              <div className='text-center mt-4 mb-4'>
-                Don't have an account yet?{" "}
-                <Link to={"/register"} style={{ textDecoration: "none" }}>
-                  Register here
-                </Link>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+        <div className={styles.registerLink}>
+          Don't have an account?{" "}
+          <Link to="/register" className={styles.link}>
+            Register here
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 
