@@ -4,11 +4,11 @@ import { useParams, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { nanoid } from "nanoid";
 
+// Icons
+import { FaTrash, FaEdit, FaPlus, FaMapMarkerAlt } from "react-icons/fa";
+
+// Actions
 import { fetchUserOrders } from "../../store/features/orderSlice";
-import { Container, Row, Col, Card, ListGroup, Table } from "react-bootstrap";
-import placeholder from "../../assets/images/placeholder.png";
-import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
-import AddressForm from "../common/AddressForm";
 import {
   updateAddress,
   addAddress,
@@ -16,15 +16,25 @@ import {
   setUserAddresses,
   getUserById,
 } from "../../store/features/userSlice";
+
+// Components
+import AddressForm from "../common/AddressForm";
 import LoadSpinner from "../common/LoadSpinner";
+import placeholder from "../../assets/images/placeholder.png";
+
+// Import Styles
+import styles from "./UserProfile.module.css";
 
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { userId } = useParams();
+  
+  // Redux Selectors
   const user = useSelector((state) => state.user.user);
   const loading = useSelector((state) => state.order.loading);
   const orders = useSelector((state) => state.order.orders);
 
+  // Local State
   const [isEditing, setIsEditing] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -38,6 +48,7 @@ const UserProfile = () => {
     mobileNumber: "",
   });
 
+  // --- Address Handlers ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prevAddress) => ({
@@ -51,6 +62,8 @@ const UserProfile = () => {
     setIsEditing(true);
     setEditingAddressId(address.id);
     setShowForm(true);
+    // Scroll to form for better UX
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   };
 
   const handleAddAddress = async () => {
@@ -68,8 +81,7 @@ const UserProfile = () => {
       resetForm();
     } catch (error) {
       console.error(error);
-
-      dispatch(setUserAddresses(user.addressList));
+      dispatch(setUserAddresses(user.addressList)); // Revert on error
     }
   };
 
@@ -93,7 +105,8 @@ const UserProfile = () => {
   };
 
   const handleDeleteAddress = async (id) => {
-    console.log(`deleting address with ID :  ${id}`);
+    if(!window.confirm("Are you sure you want to delete this address?")) return;
+
     const updatedAddressList = user.addressList.filter(
       (address) => address.id !== id
     );
@@ -122,6 +135,7 @@ const UserProfile = () => {
     setEditingAddressId(null);
   };
 
+  // --- Effects ---
   useEffect(() => {
     const fetchUser = async () => {
       if (userId) {
@@ -139,105 +153,58 @@ const UserProfile = () => {
     dispatch(fetchUserOrders(userId));
   }, [dispatch, userId]);
 
-  if (loading) {
-    return (
-      <div>
-        <LoadSpinner />
-      </div>
-    );
-  }
+  if (loading) return <LoadSpinner />;
 
   return (
-    <Container className='mt-5 mb-5'>
-      <ToastContainer />
-      <h2 className='cart-title'>User Dashboard</h2>
+    <div className={styles.container}>
+      <ToastContainer position="top-right" />
+      
+      <h2 className={styles.pageTitle}>My Dashboard</h2>
+
       {user ? (
-        <>
-          <Row className='mb-4'>
-            <Col md={4}>
-              <Card>
-                <Card.Header>Personal User Information</Card.Header>
-                <Card.Body className='text-center'>
-                  <div className='mb-3'>
-                    <img
-                      src={user.photo || placeholder}
-                      alt='User Photo'
-                      style={{ width: "100px", height: "100px" }}
-                      className='image-fluid rounded-circle'
-                    />
-                  </div>
+        <div className={styles.dashboardGrid}>
+          
+          {/* --- LEFT: Profile Sidebar --- */}
+          <aside className={styles.profileCard}>
+            <img
+              src={user.photo || placeholder}
+              alt="User"
+              className={styles.avatar}
+            />
+            <h3 className={styles.userName}>
+              {user.firstName} {user.lastName}
+            </h3>
+            <p className={styles.userEmail}>{user.email}</p>
+            
+            <div className={styles.divider}></div>
+            
+            {/* Optional Sidebar Links could go here */}
+            <div style={{color: '#888', fontSize: '0.9rem'}}>
+              Member since {new Date().getFullYear()}
+            </div>
+          </aside>
 
-                  <Card.Text>
-                    {" "}
-                    <strong> Full Name :</strong> {user.firstName}{" "}
-                    {user.lastName}
-                  </Card.Text>
-
-                  <Card.Text>
-                    {" "}
-                    <strong> Email :</strong> {user.email}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={8}>
-              <Card className='mb-4'>
-                <Card.Header>User Addresses</Card.Header>
-
-                <ListGroup variant='flush'>
-                  {user.addressList && user.addressList.length > 0 ? (
-                    user.addressList.map((address) => (
-                      <ListGroup.Item key={address.id}>
-                        <Card className='p-2 mb-2 shadow'>
-                          <Card.Body>
-                            <Card.Text>
-                              {" "}
-                              {address.addressType} ADDRESS :{" "}
-                            </Card.Text>
-                            <hr />
-
-                            <Card.Text>
-                              {address.street}, {address.city}, {address.state},{" "}
-                              {address.country}
-                            </Card.Text>
-                          </Card.Body>
-
-                          <div className='d-flex gap-4'>
-                            <Link>
-                              <span
-                                className='text-danger'
-                                onClick={() => handleDeleteAddress(address.id)}>
-                                <FaTrash />
-                              </span>
-                            </Link>
-                            <Link variant='primary'>
-                              <span
-                                className='text-info'
-                                onClick={() => handleEditClick(address)}>
-                                <FaEdit />
-                              </span>
-                            </Link>
-                          </div>
-                        </Card>
-                      </ListGroup.Item>
-                    ))
-                  ) : (
-                    <p> No addresses found</p>
-                  )}
-                </ListGroup>
-
-                <Link
-                  className='mb-2 ms-2'
-                  variant='success'
+          {/* --- RIGHT: Main Content --- */}
+          <main className={styles.mainContent}>
+            
+            {/* 1. Address Section */}
+            <section>
+              <div className={styles.sectionHeader}>
+                <h4 className={styles.sectionTitle}>My Addresses</h4>
+                <button 
+                  className={styles.addAddressBtn}
                   onClick={() => {
-                    setShowForm(true);
-                    setIsEditing(false);
-                  }}>
-                  <FaPlus />
-                </Link>
+                    resetForm();
+                    setShowForm(!showForm);
+                  }}
+                >
+                  <FaPlus /> {showForm ? "Close Form" : "Add New"}
+                </button>
+              </div>
 
-                {showForm && (
+              {/* Add/Edit Form */}
+              {showForm && (
+                <div className={styles.formWrapper}>
                   <AddressForm
                     address={newAddress}
                     onChange={handleInputChange}
@@ -253,152 +220,133 @@ const UserProfile = () => {
                     showTitle={true}
                     showAddressType={true}
                   />
-                )}
-              </Card>
-            </Col>
-          </Row>
+                </div>
+              )}
 
-          <Row>
-            <Col>
-              <Card>
-                <Card.Header>Orders History</Card.Header>
-                <Container className='mt-4'>
-                  {Array.isArray(orders) && orders.length === 0 ? (
-                    <p>No orders found at the moment.</p>
-                  ) : (
-                    <Table>
-                      <thead>
-                        <tr>
-                          <th>Order ID</th>
-                          <th>Date</th>
-                          <th>Total Amount</th>
-                          <th>Order Status</th>
-                          <th>Items</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Array.isArray(orders) &&
-                          orders.map((order, index) => {
-                            return (
-                              <tr key={index}>
-                                <td>{order?.id}</td>
-                                <td>
-                                  {new Date(
-                                    order?.orderDate
-                                  ).toLocaleDateString()}
-                                </td>
-                                <td>${order?.totalAmount?.toFixed(2)}</td>
-                                <td>{order?.orderStatus}</td>
-                                <td>
-                                  <Table size='sm' striped bordered hover>
-                                    <thead>
-                                      <tr>
-                                        <th>Item ID</th>
-                                        <th>Name</th>
-                                        <th>Brand</th>
-                                        <th>Quantity</th>
-                                        <th>Unit Price</th>
-                                        <th>Total Price</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {Array.isArray(order?.items) &&
-                                        order?.items.map((item, itemIndex) => (
-                                          <tr key={itemIndex}>
-                                            <td>{item.productId}</td>
-                                            <td>{item.productName}</td>
-                                            <td>{item.productBrand}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>${item.price.toFixed(2)}</td>
-                                            <td>
-                                              $
-                                              {(
-                                                item.quantity * item.price
-                                              ).toFixed(2)}
-                                            </td>
-                                          </tr>
-                                        ))}
-                                    </tbody>
-                                  </Table>
+              {/* Address List Grid */}
+              <div className={styles.addressGrid}>
+                {user.addressList && user.addressList.length > 0 ? (
+                  user.addressList.map((address) => (
+                    <div key={address.id} className={styles.addressCard}>
+                      <span className={styles.addressType}>
+                        <FaMapMarkerAlt style={{marginRight: '5px'}}/> 
+                        {address.addressType}
+                      </span>
+                      
+                      <div className={styles.addressText}>
+                        {address.street}<br />
+                        {address.city}, {address.state} {address.country}<br />
+                        {address.mobileNumber && <span>Phone: {address.mobileNumber}</span>}
+                      </div>
+
+                      <div className={styles.cardActions}>
+                        <button 
+                          className={`${styles.iconBtn} ${styles.editIcon}`}
+                          onClick={() => handleEditClick(address)}
+                          title="Edit Address"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button 
+                          className={`${styles.iconBtn} ${styles.deleteIcon}`}
+                          onClick={() => handleDeleteAddress(address.id)}
+                          title="Delete Address"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-muted">No addresses found. Please add one.</p>
+                )}
+              </div>
+            </section>
+
+            {/* 2. Order History Section */}
+            <section>
+              <div className={styles.sectionHeader}>
+                <h4 className={styles.sectionTitle}>Recent Orders</h4>
+                <Link to="/products" style={{fontSize: '0.9rem', color: '#c38212', textDecoration: 'none'}}>
+                  Start Shopping
+                </Link>
+              </div>
+
+              <div className={styles.ordersList}>
+                {Array.isArray(orders) && orders.length > 0 ? (
+                  orders.map((order, index) => (
+                    <div key={index} className={styles.orderCard}>
+                      
+                      {/* Order Summary Header */}
+                      <div className={styles.orderHeader}>
+                        <div className={styles.orderMeta}>
+                          <div className={styles.metaGroup}>
+                            <span className={styles.metaLabel}>Order ID</span>
+                            <span className={styles.metaValue}>#{order.id}</span>
+                          </div>
+                          <div className={styles.metaGroup}>
+                            <span className={styles.metaLabel}>Date</span>
+                            <span className={styles.metaValue}>
+                              {new Date(order.orderDate).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className={styles.metaGroup}>
+                            <span className={styles.metaLabel}>Total</span>
+                            <span className={styles.metaValue}>
+                              ${order.totalAmount?.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <span className={styles.statusBadge}>
+                          {order.orderStatus || "Processing"}
+                        </span>
+                      </div>
+
+                      {/* Order Items Table */}
+                      <div className={styles.orderTableWrapper}>
+                        <table className={styles.orderTable}>
+                          <thead>
+                            <tr>
+                              <th>Product</th>
+                              <th>Brand</th>
+                              <th>Qty</th>
+                              <th>Price</th>
+                              <th style={{textAlign: 'right'}}>Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Array.isArray(order.items) && order.items.map((item, i) => (
+                              <tr key={i}>
+                                <td>{item.productName}</td>
+                                <td>{item.productBrand}</td>
+                                <td>{item.quantity}</td>
+                                <td>${item.price?.toFixed(2)}</td>
+                                <td style={{textAlign: 'right', fontWeight: '600'}}>
+                                  ${(item.quantity * item.price).toFixed(2)}
                                 </td>
                               </tr>
-                            );
-                          })}
-                      </tbody>
-                    </Table>
-                  )}
-                  <div className='mb-2'>
-                    <Link to='/products'>Start Shopping </Link>
-                  </div>
-                </Container>
-              </Card>
-            </Col>
-          </Row>
-        </>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-muted">No orders found.</p>
+                )}
+              </div>
+            </section>
+
+          </main>
+        </div>
       ) : (
-        <p>Loading user information....</p>
+        <div className="text-center py-5">
+          <p>Loading user information...</p>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 
 export default UserProfile;
-
-/* 
-
-Assignment 16:
-
-1. Modify the addres API in our backend to include a phone number;
-
-2. Implement the UserProfile component to displays the following information:
-
-      1.  The user full name and email address;
-      2.  The list of user orders with each order information on a separate card.
-      3.  The list of user addresses with each address information on a separate card
-      with the following options:
-        a.  Enable user to remove /delete address.
-        b.  Enable user to edit/update address.
-        c.  Enable user to add new address
-
-
- You don't have to worry about the implementation of(add new address and update the address),
-  you just have to indicate these actions with a Link / button on the card. But the
-  delete implementation should be done since this is a straigthforward implementation.
-
-
-Hint:
-You may want to take a proper look at the address api implementation at the backend.
-
-
-Finally, let all your actions and data pass through the redux store ( userProfileSlice ).
-
-Please remember to handle any potential errors or edge cases.
-
-Remember, this is just a basic implementation. You might need to make some adjustments
- and enhancements based on your specific requirements.
-
-
-Good luck!!!
-
-
-
-
-  <div className='d-flex gap-4'>
-                            <Link >
-                              <span className='text-danger'>
-                                <FaTrash />
-                              </span>
-                            </Link>
-                            <Link  variant='primary'>
-                              <span className='text-info'>
-                                <FaEdit />
-                              </span>
-                            </Link>
-                          </div>
-
-
-                             <Link className='mb-2 ms-2'  variant='success'  >
-                  <FaPlus />
-                </Link>
-
-*/

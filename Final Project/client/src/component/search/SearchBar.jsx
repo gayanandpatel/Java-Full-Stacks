@@ -1,31 +1,38 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaSearch, FaTimes } from "react-icons/fa";
+
+// Actions
 import { getAllCategories } from "../../store/features/categorySlice";
 import {
   setSearchQuery,
   setSelectedCategory,
   clearFilters,
 } from "../../store/features/searchSlice";
-import { useNavigate, useParams } from "react-router-dom";
+
+// Import Styles
+import styles from "./SearchBar.module.css";
 
 const SearchBar = () => {
   const dispatch = useDispatch();
   const { categoryId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Kept for potential future use
+  
   const categories = useSelector((state) => state.category.categories);
-
   const { searchQuery, selectedCategory } = useSelector(
     (state) => state.search
   );
 
+  // Sync URL category with Redux state
   useEffect(() => {
     if (categoryId && categories.length > 0) {
-      const seletedCategory = categories.find(
+      const currentCategory = categories.find(
         (category) => category.id === parseInt(categoryId, 10)
       );
 
-      if (seletedCategory) {
-        dispatch(setSelectedCategory(seletedCategory.name));
+      if (currentCategory) {
+        dispatch(setSelectedCategory(currentCategory.name));
       } else {
         dispatch(setSelectedCategory("all"));
       }
@@ -38,7 +45,7 @@ const SearchBar = () => {
 
   const handleClearFilters = () => {
     dispatch(clearFilters());
-   // navigate("/products");
+    // navigate("/products"); // Uncomment if you want to redirect on clear
   };
 
   const handleSearchQueryChange = (e) => {
@@ -50,29 +57,51 @@ const SearchBar = () => {
   }, [dispatch]);
 
   return (
-    <div className='search-bar input-group input-group-sm'>
-      <select
-        value={selectedCategory}
-        onChange={handleCategoryChange}
-        className='form-control-sm'>
-        <option value='all'>All Category</option>
-        {categories.map((category, index) => (
-          <option key={index} value={category.name}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+    <div className={styles.container}>
+      
+      {/* Category Dropdown */}
+      <div className={styles.categoryWrapper}>
+        <select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          className={styles.select}
+          aria-label="Select Category"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((category, index) => (
+            <option key={index} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
+      {/* Search Input */}
       <input
-        type='text'
+        type="text"
         value={searchQuery}
         onChange={handleSearchQueryChange}
-        className='form-control'
-        placeholder='search for product(e.g. watch..)'
+        className={styles.input}
+        placeholder="Search for products (e.g. watch, laptop...)"
+        aria-label="Search"
       />
-      <button className='search-button' onClick={handleClearFilters}>
-        Clear Filter
-      </button>
+
+      {/* Actions */}
+      <div className={styles.actions}>
+        {(searchQuery || selectedCategory !== "all") && (
+          <button 
+            className={styles.clearBtn} 
+            onClick={handleClearFilters}
+            title="Clear all filters"
+          >
+            Clear <FaTimes style={{marginLeft: '4px', verticalAlign: 'middle'}}/>
+          </button>
+        )}
+        
+        <div className={styles.searchIconWrapper}>
+          <FaSearch />
+        </div>
+      </div>
     </div>
   );
 };

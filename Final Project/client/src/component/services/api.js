@@ -1,28 +1,44 @@
 import axios from "axios";
-import { logoutUser } from "./AuthService";
+import { logoutUser } from "./authService"; // Ensure casing matches filename
 
-const BASE_URL = "http://localhost:9090/api/v1";
-//const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Use environment variable with a fallback for local development
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:9090/api/v1";
 
+// Public API client (no auth needed)
 export const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
+// Private API client (requires auth)
 export const privateApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-const refreshToken = async () => {
-  try {
-    const response = await api.post("/auth/refresh-token");
-    return response.data.accessToken;
-  } catch (error) {
-    return Promise.reject(error);
-  }
+// --- Concurrency Handling Variables ---
+let isRefreshing = false;
+let failedQueue = [];
+
+// Helper to process the queue of failed requests
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
 };
 
+// Request Interceptor: Attaches Token
 privateApi.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("authToken");
@@ -31,29 +47,61 @@ privateApi.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Response Interceptor: Handles Token Refresh
 privateApi.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error && !originalRequest._retry) {
+
+    // Check if error is 401 (Unauthorized) and we haven't retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      
+      // If a refresh is already in progress, queue this request
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return privateApi(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
-        const newAccessToken = await refreshToken();
+        // Attempt to refresh the token
+        const response = await api.post("/auth/refresh-token");
+        const newAccessToken = response.data.accessToken;
+
+        // Store new token
         localStorage.setItem("authToken", newAccessToken);
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        
+        // Update the original header
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`; // Fix header assignment
+
+        // Process any queued requests with the new token
+        processQueue(null, newAccessToken);
+
+        // Return the original request execution
         return privateApi(originalRequest);
       } catch (refreshError) {
+        // If refresh fails, reject all queued requests and logout
+        processQueue(refreshError, null);
         logoutUser();
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
+
     return Promise.reject(error);
   }
 );

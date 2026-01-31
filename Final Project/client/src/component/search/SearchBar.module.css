@@ -1,0 +1,149 @@
+/* SearchBar.module.css */
+
+.container {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0; /* Thicker border for better visibility */
+  border-radius: 50px; /* Modern pill shape */
+  padding: 4px;
+  width: 100%;
+  max-width: 850px; /* Optimal reading width */
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.container:focus-within {
+  border-color: var(--search-button-color, #c38212);
+  box-shadow: 0 4px 20px rgba(195, 130, 18, 0.15);
+}
+
+/* Category Dropdown */
+.categoryWrapper {
+  position: relative;
+  border-right: 1px solid #e0e0e0;
+}
+
+.select {
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  padding: 12px 15px 12px 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  outline: none;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 50px 0 0 50px;
+  transition: background-color 0.2s;
+}
+
+.select:hover {
+  background-color: #f8f9fa;
+  color: #222;
+}
+
+.select:focus {
+  background-color: #f0f0f0;
+}
+
+/* Input Field */
+.input {
+  flex: 1;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  background: transparent;
+  min-width: 0; /* Prevents flex items from overflowing */
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+/* Action Buttons Area */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 5px;
+}
+
+/* Clear Button (Secondary) */
+.clearBtn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clearBtn:hover {
+  background-color: #fee2e2;
+  color: #dc2626; /* Red color for clear action */
+}
+
+/* Search Icon (Visual Indicator) */
+.searchIconWrapper {
+  background-color: var(--search-button-color, #c38212);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background-color 0.2s;
+}
+
+.container:focus-within .searchIconWrapper {
+  transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .container {
+    border-radius: 12px; /* Less rounded on small screens to save space */
+    flex-wrap: wrap;
+    padding: 8px;
+  }
+
+  .categoryWrapper {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+  }
+  
+  .select {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+}
