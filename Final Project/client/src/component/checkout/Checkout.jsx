@@ -7,21 +7,47 @@ import {
   createPaymentIntent,
 } from "../../store/features/orderSlice";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { Col, Container, FormGroup, Row, Form, Card } from "react-bootstrap";
-import AddressForm from "../common/AddressForm";
 import { toast, ToastContainer } from "react-toastify";
-import { cardElementOptions } from "../utils/cardElementOptions";
 import { ClipLoader } from "react-spinners";
+
+// Styles
+import styles from "./Checkout.module.css";
+
+// ISO 3166-1 alpha-2 Country Codes for Stripe
+const COUNTRY_OPTIONS = [
+  { code: "IN", name: "India" },
+  { code: "US", name: "United States" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "JP", name: "Japan" },
+  { code: "BR", name: "Brazil" },
+  { code: "CN", name: "China" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "MX", name: "Mexico" },
+  { code: "RU", name: "Russia" },
+  { code: "ZA", name: "South Africa" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "SG", name: "Singapore" },
+  // You can add more countries here as needed
+];
 
 const Checkout = () => {
   const dispatch = useDispatch();
-  const { userId } = useParams(); // userId : 28
+  const { userId } = useParams();
   const navigate = useNavigate();
 
+  // Redux State
   const cart = useSelector((state) => state.cart);
 
+  // Stripe Hooks
   const stripe = useStripe();
   const elements = useElements();
+
+  // Local State
   const [cardError, setCardError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -35,9 +61,16 @@ const Checkout = () => {
     street: "",
     city: "",
     state: "",
-    country: "",
+    postalCode: "",
+    country: "", // This will now store the 2-letter code (e.g., "IN")
   });
 
+  // Load Cart
+  useEffect(() => {
+    dispatch(getUserCart(userId));
+  }, [dispatch, userId]);
+
+  // Handlers
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserInfo({ ...userInfo, [name]: value });
@@ -48,32 +81,46 @@ const Checkout = () => {
     setBillingAddress({ ...billingAddress, [name]: value });
   };
 
-  useEffect(() => {
-    dispatch(getUserCart(userId));
-  }, [dispatch, userId]);
+  // Custom Stripe Element Styling
+  const stripeElementOptions = {
+    style: {
+      base: {
+        fontSize: "16px",
+        color: "#424770",
+        fontFamily: "Inter, sans-serif",
+        "::placeholder": {
+          color: "#aab7c4",
+        },
+      },
+      invalid: {
+        color: "#dc3545",
+      },
+    },
+  };
 
   const handlePaymentAndOrder = async (event) => {
     event.preventDefault();
     setLoading(true);
 
-    // 1. Check stripe presence
     if (!stripe || !elements) {
-      toast.error("Loading..., please try again");
+      toast.error("Payment system not ready. Please try again.");
+      setLoading(false);
       return;
     }
 
     const cardElement = elements.getElement(CardElement);
 
     try {
-      // 2. Create the paymentIntent through the backend;
+      // 1. Create Payment Intent
       const { clientSecret } = await dispatch(
         createPaymentIntent({
-          amount: cart.totalAmount, // Convert to cents
-          currency: "usd", // Set your desired currency
+          amount: Math.round(cart.totalAmount * 100), // Ensure amount is in cents
+          currency: "usd",
         })
       ).unwrap();
 
-      // 3. Comfirm the payment intent with the card details
+      // 2. Confirm Card Payment
+      // Note: We are passing billingAddress.country which now holds the code "US", "IN", etc.
       const { error, paymentIntent } = await stripe.confirmCardPayment(
         clientSecret,
         {
@@ -86,139 +133,230 @@ const Checkout = () => {
                 line1: billingAddress.street,
                 city: billingAddress.city,
                 state: billingAddress.state,
-                country: billingAddress.country,
+                country: billingAddress.country, // Correct ISO code passed here
                 postal_code: billingAddress.postalCode,
               },
             },
           },
         }
       );
-      // 4. Place the order after successful payment
 
       if (error) {
+        setCardError(error.message);
         toast.error(error.message);
+        setLoading(false);
         return;
       }
+
+      // 3. Place Order on Backend
       if (paymentIntent.status === "succeeded") {
-        await dispatch(placeOrder({ userId })).unwrap(); // userId : 28
-        toast.success("Payment successful! Your order has been placed.");
+        await dispatch(placeOrder({ userId })).unwrap();
+        toast.success("Order placed successfully!");
+        
         setTimeout(() => {
-          window.location.href=`/user-profile/${userId}/profile`;          
-        }, 5000);       
+          window.location.href = `/user-profile/${userId}/profile`;
+        }, 2000);
       }
     } catch (error) {
-      toast.error("Error processing payment: ", error.message);
+      toast.error(`Error: ${error.message || "Something went wrong"}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container className='mt-5 mb-5'>
-      <ToastContainer />
-      <div className='d-flex justify-content-center'>
-        <Row>
-          <Col md={8}>
-            <Form className='p-4 border rounded shadow-sm'>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <label htmlFor='firstName' className='form-label'>
-                      Firstname
-                    </label>
-                    <input
-                      type='text'
-                      className='form-control mb-2'
-                      id='name'
-                      name='firstName'
-                      value={userInfo.firstName}
-                      onChange={handleInputChange}
-                    />
-                  </FormGroup>
-                </Col>
+    <div className={styles.checkoutContainer}>
+      <ToastContainer position="top-center" />
+      
+      <h2 className={styles.pageTitle}>Secure Checkout</h2>
 
-                <Col md={6}>
-                  <FormGroup>
-                    <label htmlFor='lastName' className='form-label'>
-                      Lastname
-                    </label>
-                    <input
-                      type='text'
-                      className='form-control mb-2'
-                      id='name'
-                      name='lastName'
-                      value={userInfo.lastName}
-                      onChange={handleInputChange}
-                    />
-                  </FormGroup>
-                </Col>
-              </Row>
-
-              <FormGroup>
-                <label htmlFor='email' className='form-label'>
-                  Email
-                </label>
-                <input
-                  type='email'
-                  className='form-control mb-2'
-                  id='email'
-                  name='email'
-                  value={userInfo.email}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-
-              <div>
-                <h6>Enter Billing Address</h6>
-                <AddressForm
-                  onChange={handleAddressChange}
-                  address={billingAddress}
-                />
-              </div>
-
-              <div className='form-group'>
-                <label htmlFor='card-element' className='form-label'>
-                  <h6>Credit or Debit Card</h6>
-                </label>
-                <div id='card-element' className='form-control'>
-                  <CardElement
-                    options={cardElementOptions}
-                    onChange={(event) => {
-                      setCardError(event.error ? event.error.message : "");
-                    }}
+      <div className={styles.layoutGrid}>
+        
+        {/* --- LEFT COLUMN: Input Forms --- */}
+        <div className={styles.formSection}>
+          <form onSubmit={handlePaymentAndOrder}>
+            
+            {/* 1. Customer Info */}
+            <div className={styles.sectionHeader}>
+              <span>1</span> Customer Information
+            </div>
+            
+            <div className={styles.row}>
+              <div className={styles.col}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="firstName" className={styles.label}>First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    id="firstName"
+                    className={styles.input}
+                    value={userInfo.firstName}
+                    onChange={handleInputChange}
+                    required
                   />
-                  {cardError && <div className='text-danger'>{cardError}</div>}
                 </div>
               </div>
-            </Form>
-          </Col>
+              <div className={styles.col}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="lastName" className={styles.label}>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    id="lastName"
+                    className={styles.input}
+                    value={userInfo.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
 
-          <Col md={4}>
-            <h6 className='mt-4 text-center cart-title'>Your Order Summary</h6>
-            <hr />
-            <Card style={{ backgroundColor: "whiteSmoke" }}>
-              <Card.Body>
-                <Card.Title className='mb-2 text-muted text-success'>
-                  Tatal Amount : ${cart.totalAmount.toFixed(2)}
-                </Card.Title>
-              </Card.Body>
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.label}>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                className={styles.input}
+                value={userInfo.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-              <button
-                type='submit'
-                className='btn btn-warning mt-3'
-                disabled={!stripe}
-                onClick={(e) => handlePaymentAndOrder(e)}>
-                {loading ? (
-                  <ClipLoader size={20} color={"#123abc"} />
-                ) : (
-                  "Pay Now"
-                )}
-              </button>
-            </Card>
-          </Col>
-        </Row>
+            {/* 2. Billing Address */}
+            <div className={styles.sectionHeader} style={{marginTop: '30px'}}>
+              <span>2</span> Billing Address
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Street Address</label>
+              <input
+                type="text"
+                name="street"
+                className={styles.input}
+                value={billingAddress.street}
+                onChange={handleAddressChange}
+                required
+              />
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.col}>
+                <label className={styles.label}>City</label>
+                <input
+                  type="text"
+                  name="city"
+                  className={styles.input}
+                  value={billingAddress.city}
+                  onChange={handleAddressChange}
+                  required
+                />
+              </div>
+              <div className={styles.col}>
+                <label className={styles.label}>State / Province</label>
+                <input
+                  type="text"
+                  name="state"
+                  className={styles.input}
+                  value={billingAddress.state}
+                  onChange={handleAddressChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.col}>
+                <label className={styles.label}>Postal Code</label>
+                <input
+                  type="text"
+                  name="postalCode"
+                  className={styles.input}
+                  value={billingAddress.postalCode}
+                  onChange={handleAddressChange}
+                  required
+                />
+              </div>
+              <div className={styles.col}>
+                <label className={styles.label}>Country</label>
+                {/* CHANGED: Replaced input with Select for Stripe Compatibility */}
+                <select
+                  name="country"
+                  className={styles.input} // Reuses existing input styles
+                  value={billingAddress.country}
+                  onChange={handleAddressChange}
+                  required
+                >
+                  <option value="">Select Country</option>
+                  {COUNTRY_OPTIONS.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* 3. Payment Details */}
+            <div className={styles.sectionHeader} style={{marginTop: '30px'}}>
+              <span>3</span> Payment Details
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Credit or Debit Card</label>
+              <div className={styles.stripeContainer}>
+                <CardElement
+                  options={stripeElementOptions}
+                  onChange={(event) => {
+                    setCardError(event.error ? event.error.message : "");
+                  }}
+                />
+              </div>
+              {cardError && <div className={styles.cardError}>{cardError}</div>}
+            </div>
+            
+          </form>
+        </div>
+
+        {/* --- RIGHT COLUMN: Summary --- */}
+        <div className={styles.summaryCard}>
+          <h3 className={styles.summaryTitle}>Order Summary</h3>
+          
+          <div className={styles.summaryRow}>
+            <span>Subtotal</span>
+            <span>${cart.totalAmount?.toFixed(2)}</span>
+          </div>
+          <div className={styles.summaryRow}>
+            <span>Tax (Estimated)</span>
+            <span>$0.00</span>
+          </div>
+          <div className={styles.summaryRow}>
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+          
+          <div className={styles.totalRow}>
+            <span>Total</span>
+            <span>${cart.totalAmount?.toFixed(2)}</span>
+          </div>
+
+          <button
+            type="button"
+            className={styles.payBtn}
+            disabled={!stripe || loading}
+            onClick={handlePaymentAndOrder}
+          >
+            {loading ? (
+              <ClipLoader size={20} color={"#ffffff"} />
+            ) : (
+              `Pay $${cart.totalAmount?.toFixed(2)}`
+            )}
+          </button>
+        </div>
       </div>
-    </Container>
+    </div>
   );
 };
 

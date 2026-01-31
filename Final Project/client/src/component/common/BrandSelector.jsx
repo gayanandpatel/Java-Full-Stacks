@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllBrands, addBrand } from "../../store/features/productSlice";
 
+// Import styles
+import styles from "./BrandSelector.module.css";
+
 const BrandSelector = ({
   selectedBrand,
   onBrandChange,
@@ -39,35 +42,38 @@ const BrandSelector = ({
   };
 
   return (
-    <div className='mb-3'>
-      <label className='form-label'> Brands :</label>
+    <div className={styles.container}>
+      <label className={styles.label}>Brand</label>
       <select
-        className='form-select'
+        className={styles.select}
         required
         value={selectedBrand}
-        onChange={handleBrandChange}>
-        <option value=''>All Brands</option>
-        <option value='New'>Add New Brand</option>
+        onChange={handleBrandChange}
+      >
+        <option value="">All Brands</option>
         {brands.map((brand, index) => (
           <option key={index} value={brand}>
             {brand}
           </option>
         ))}
+        <option value="New">+ Add New Brand</option>
       </select>
+
       {showNewBrandInput && (
-        <div className='input-group'>
+        <div className={styles.inputGroup}>
           <input
-            type='text'
-            className='form-control'
+            type="text"
+            className={styles.input}
             value={newBrand}
-            placeholder='Enter new brand'
+            placeholder="Enter new brand name"
             onChange={handleNewBrandChange}
           />
           <button
-            className='btn btn-secondary btn-sm'
-            type='button'
-            onClick={handleAddNewBrand}>
-            Add Brand
+            className={styles.addButton}
+            type="button"
+            onClick={handleAddNewBrand}
+          >
+            Add
           </button>
         </div>
       )}
