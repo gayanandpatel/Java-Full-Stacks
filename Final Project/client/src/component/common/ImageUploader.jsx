@@ -1,10 +1,12 @@
 import React, { useState, useRef } from "react";
 import { nanoid } from "nanoid";
 import { uploadImages } from "../../store/features/imageSlice";
-import { toast, ToastContainer } from "react-toastify";
-import { Link } from "@mui/material";
+import { toast } from "react-toastify";
 import { BsPlus, BsDash } from "react-icons/bs";
 import { useDispatch } from "react-redux";
+
+// Import styles
+import styles from "./ImageUploader.module.css";
 
 const ImageUploader = ({ productId }) => {
   const dispatch = useDispatch();
@@ -23,7 +25,8 @@ const ImageUploader = ({ productId }) => {
     setImages((prevImages) => [...prevImages, ...newImages]);
   };
 
-  const handleAddImageInput = () => {
+  const handleAddImageInput = (e) => {
+    e.preventDefault(); // Prevent any form submission or link jump
     setImageInputs((prevInputs) => [...prevInputs, { id: nanoid() }]);
   };
 
@@ -34,17 +37,29 @@ const ImageUploader = ({ productId }) => {
   const handleImageUpload = async (e) => {
     e.preventDefault();
     if (!productId) {
+      toast.error("Product ID is missing.");
       return;
     }
+    
+    // Check if we actually have files selected
     if (Array.isArray(images) && images.length > 0) {
       try {
-        const result = await dispatch(uploadImages({ productId, files: images.map((image) => image.file) })
+        const result = await dispatch(
+          uploadImages({ 
+            productId, 
+            files: images.map((image) => image.file) 
+          })
         ).unwrap();
+        
         clearFileInputs();
-        toast.success(result.message);
+        setImages([]); // Clear local state of files
+        setImageInputs([{ id: nanoid() }]); // Reset to single input
+        toast.success(result.message || "Images uploaded successfully!");
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error.message || "Failed to upload images");
       }
+    } else {
+      toast.warning("Please select at least one image.");
     }
   };
 
@@ -55,43 +70,50 @@ const ImageUploader = ({ productId }) => {
   };
 
   return (
-    <form onSubmit={handleImageUpload}>
-      <div className='mt-4'>
-        <h5>Upload product image (s)</h5>
+    <div className={styles.container}>
+      <form onSubmit={handleImageUpload}>
+        
+        <div className={styles.header}>
+          <h5 className={styles.title}>Product Images</h5>
+          <button 
+            type="button" 
+            onClick={handleAddImageInput} 
+            className={styles.addMoreBtn}
+          >
+            <BsPlus className={styles.icon} /> Add More
+          </button>
+        </div>
 
-        <Link to={"#"} onClick={handleAddImageInput}>
-          <BsPlus className='icon' /> Add More Images
-        </Link>
-
-        <div className='mb-2 mt-2'>
+        <div className={styles.inputList}>
           {imageInputs.map((input, index) => (
-            <div
-              key={input.id}
-              className='d-flex align-items-center mb-2 input-group'>
+            <div key={input.id} className={styles.inputGroup}>
               <input
-                type='file'
+                type="file"
                 multiple
-                accept='image/*'
+                accept="image/*"
                 onChange={handleImageChange}
-                className='me-2 form-control'
+                className={styles.fileInput}
                 ref={(el) => (fileInputRefs.current[index] = el)}
               />
               <button
-                className='btn btn-danger'
-                onClick={() => handleRemoveImageInput(input.id)}>
-                <BsDash />
+                type="button"
+                className={styles.removeBtn}
+                onClick={() => handleRemoveImageInput(input.id)}
+                title="Remove this input"
+              >
+                <BsDash className={styles.icon} />
               </button>
             </div>
           ))}
         </div>
 
         {imageInputs.length > 0 && (
-          <button type='submit' className='btn btn-primary btn-sm'>
+          <button type="submit" className={styles.uploadBtn}>
             Upload Images
           </button>
         )}
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

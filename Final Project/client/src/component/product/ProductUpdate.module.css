@@ -1,0 +1,238 @@
+/* ProductUpdate.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #333;
+}
+
+.header {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+/* Main Layout: Form (Left) | Images (Right) */
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; 
+  gap: 40px;
+  align-items: start;
+}
+
+/* --- Form Section --- */
+.formSection {
+  background: white;
+  padding: 35px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+.formGroup {
+  margin-bottom: 25px;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background-color: #fcfcfc;
+  outline: none;
+}
+
+.input:focus, .textarea:focus {
+  border-color: var(--search-button-color, #c38212);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(195, 130, 18, 0.1);
+}
+
+.textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.submitBtn {
+  background-color: #111;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+  display: block;
+  width: 100%;
+}
+
+.submitBtn:hover {
+  background-color: var(--search-button-color, #c38212);
+  transform: translateY(-2px);
+}
+
+/* --- Image Manager Section --- */
+.imageSection {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  position: sticky;
+  top: 100px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.imageList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Scrollbar for image list */
+.imageList::-webkit-scrollbar {
+  width: 4px;
+}
+.imageList::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.imageCard {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+}
+
+.imageCard:hover {
+  border-color: #ddd;
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Targeting the img inside ProductImage if possible, or wrapper handles it */
+.imageWrapper :global(img) {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.imageActions {
+  display: flex;
+  gap: 10px;
+}
+
+.actionBtn {
+  flex: 1;
+  font-size: 0.85rem;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.editBtn {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.editBtn:hover {
+  background-color: #dee2e6;
+  color: #212529;
+}
+
+.deleteBtn {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.deleteBtn:hover {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* Add Image Button */
+.addImageBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  transition: all 0.2s;
+}
+
+.addImageBtn:hover {
+  border-color: var(--search-button-color, #c38212);
+  color: var(--search-button-color, #c38212);
+  background-color: #fffbf5;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .layoutGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .imageSection {
+    position: static;
+    order: 2; /* Move below form on mobile if desired */
+  }
+}

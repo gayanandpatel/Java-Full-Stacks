@@ -1,38 +1,41 @@
 import React, { useState, useEffect } from "react";
-import ProductCard from "./ProductCard";
-import SearchBar from "../search/SearchBar";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useParams } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
+// Actions
 import {
   getAllProducts,
   getProductsByCategory,
 } from "../../store/features/productSlice";
-import { useDispatch, useSelector } from "react-redux";
-import Paginator from "../common/Paginator";
 import { setTotalItems } from "../../store/features/paginationSlice";
-import SideBar from "../common/SideBar";
 import { setInitialSearchQuery } from "../../store/features/searchSlice";
-import { useLocation, useParams } from "react-router-dom";
+
+// Components
+import ProductCard from "./ProductCard";
+import SearchBar from "../search/SearchBar";
+import Paginator from "../common/Paginator";
+import SideBar from "../common/SideBar";
 import LoadSpinner from "../common/LoadSpinner";
-import { ToastContainer } from "react-toastify";
+
+// Import styles
+import styles from "./Products.module.css";
 
 const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dispatch = useDispatch();
-  const { products, selectedBrands } = useSelector((state) => state.product);
-  const { searchQuery, selectedCategory } = useSelector(
-    (state) => state.search
-  );
-  const { itemsPerPage, currentPage } = useSelector(
-    (state) => state.pagination
-  );
-  const isLoading = useSelector((state) => state.product.isLoading);
+  
+  // Redux Selectors
+  const { products, selectedBrands, isLoading } = useSelector((state) => state.product);
+  const { searchQuery, selectedCategory } = useSelector((state) => state.search);
+  const { itemsPerPage, currentPage } = useSelector((state) => state.pagination);
 
-  const { name } = useParams();
-  const { categoryId } = useParams();
-
+  const { name, categoryId } = useParams();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialSearchQuery = queryParams.get("search") || name || "";
 
+  // Initial Fetch
   useEffect(() => {
     if (categoryId) {
       dispatch(getProductsByCategory(categoryId));
@@ -41,10 +44,12 @@ const Products = () => {
     }
   }, [dispatch, categoryId]);
 
+  // Set Search Query from URL
   useEffect(() => {
     dispatch(setInitialSearchQuery(initialSearchQuery));
   }, [initialSearchQuery, dispatch]);
 
+  // Filtering Logic
   useEffect(() => {
     const results = products.filter((product) => {
       const matchesQuery = product.name
@@ -67,10 +72,12 @@ const Products = () => {
     setFilteredProducts(results);
   }, [searchQuery, selectedCategory, selectedBrands, products]);
 
+  // Update Pagination Total
   useEffect(() => {
     dispatch(setTotalItems(filteredProducts.length));
   }, [filteredProducts, dispatch]);
 
+  // Pagination Slicing
   const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -79,35 +86,45 @@ const Products = () => {
   );
 
   if (isLoading) {
-    return (
-      <div>
-        <LoadSpinner />
-      </div>
-    );
+    return <LoadSpinner />;
   }
 
   return (
-    <>
-      <ToastContainer />
-      <div className='d-flex justify-content-center'>
-        <div className='col-md-6 mt-2'>
-          <div className='search-bar input-group'>
-            <SearchBar />
-          </div>
+    <div className={styles.pageContainer}>
+      <ToastContainer position="bottom-right" />
+      
+      {/* Search Bar Area */}
+      <div className={styles.searchSection}>
+        <div className={styles.searchWrapper}>
+          <SearchBar />
         </div>
       </div>
 
-      <div className='d-flex'>
-        <aside className='sidebar' style={{ width: "250px", padding: "1rem" }}>
+      {/* Main Content Grid */}
+      <div className={styles.layoutGrid}>
+        
+        {/* Left Sidebar */}
+        <aside className={styles.sidebarWrapper}>
           <SideBar />
         </aside>
 
-        <section style={{ flex: 1 }}>
-          <ProductCard products={currentProducts} />
+        {/* Right Product Grid */}
+        <section className={styles.productSection}>
+          {currentProducts.length > 0 ? (
+            <ProductCard products={currentProducts} />
+          ) : (
+             <div className="text-center py-5">
+                <h4>No products found</h4>
+                <p className="text-muted">Try adjusting your filters.</p>
+             </div>
+          )}
+          
+          <div className="mt-4">
+            <Paginator />
+          </div>
         </section>
       </div>
-      <Paginator />
-    </>
+    </div>
   );
 };
 

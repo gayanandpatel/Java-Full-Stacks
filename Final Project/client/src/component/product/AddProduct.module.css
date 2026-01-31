@@ -1,0 +1,129 @@
+/* AddProduct.module.css */
+
+.pageContainer {
+  min-height: 80vh;
+  padding: 40px 20px;
+  background-color: #f8f9fa; /* Light grey background for the page */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.formCard {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  border: 1px solid #e0e0e0;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Stepper Container Override */
+.stepperContainer {
+  margin-bottom: 40px;
+}
+
+/* Form Styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.input,
+.textarea {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fcfcfc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  outline: none;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--search-button-color, #c38212);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(195, 130, 18, 0.1);
+}
+
+/* Button Group */
+.btnGroup {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 14px;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: var(--search-button-color, #c38212);
+  transform: translateY(-2px);
+}
+
+.prevBtn {
+  padding: 12px 24px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #555;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.prevBtn:hover {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+/* Step 2 Specific Styles */
+.stepContainer {
+  text-align: center;
+}
+
+.stepTitle {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #555;
+}

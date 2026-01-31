@@ -5,6 +5,9 @@ import {
   addCategory,
 } from "../../store/features/categorySlice";
 
+// Import styles
+import styles from "./CategorySelector.module.css";
+
 const CategorySelector = ({
   selectedCategory,
   onCategoryChange,
@@ -22,7 +25,8 @@ const CategorySelector = ({
 
   const handleAddNewCategory = () => {
     if (newCategory !== "") {
-      dispatch(addCategory({name : newCategory}));
+      // Logic preserved: passing object { name: newCategory }
+      dispatch(addCategory({ name: newCategory }));
       onCategoryChange(newCategory);
       setNewCategory("");
       setShowNewCategoryInput(false);
@@ -42,35 +46,38 @@ const CategorySelector = ({
   };
 
   return (
-    <div className='mb-3'>
-      <label className='form-label'> Categories :</label>
+    <div className={styles.container}>
+      <label className={styles.label}>Category</label>
       <select
-        className='form-select'
+        className={styles.select}
         required
         value={selectedCategory}
-        onChange={handleCategoryChange}>
-        <option value=''>All Categories</option>
-        <option value='New'>Add New Category</option>
+        onChange={handleCategoryChange}
+      >
+        <option value="">All Categories</option>
         {categories.map((category, index) => (
           <option key={index} value={category.name}>
             {category.name}
           </option>
         ))}
+        <option value="New">+ Add New Category</option>
       </select>
+
       {showNewCategoryInput && (
-        <div className='input-group'>
+        <div className={styles.inputGroup}>
           <input
-            type='text'
-            className='form-control'
+            type="text"
+            className={styles.input}
             value={newCategory}
-            placeholder='Enter new category'
+            placeholder="Enter new category name"
             onChange={handleNewCategoryChange}
           />
           <button
-            className='btn btn-secondary btn-sm'
-            type='button'
-            onClick={handleAddNewCategory}>
-            Add Category
+            className={styles.addButton}
+            type="button"
+            onClick={handleAddNewCategory}
+          >
+            Add
           </button>
         </div>
       )}
@@ -79,15 +86,3 @@ const CategorySelector = ({
 };
 
 export default CategorySelector;
-
-/*
-
-
-Implement the category selector component following exactly this same thing 
-we did to implement the brand selector.
-
-Take that we have the category slcie already,
- so can just work with it to get task done.
-
-
-*/

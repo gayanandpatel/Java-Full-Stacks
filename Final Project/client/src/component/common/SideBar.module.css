@@ -1,0 +1,146 @@
+/* SideBar.module.css */
+
+.sidebarContainer {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  min-width: 240px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Sticky behavior for desktop */
+  position: sticky;
+  top: 100px; /* Offset from top to clear fixed navbar */
+  align-self: start;
+}
+
+.header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f5f5f5;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.brandList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh; /* Optional: Scroll if too many brands */
+  overflow-y: auto;
+}
+
+/* Scrollbar styling for the list */
+.brandList::-webkit-scrollbar {
+  width: 4px;
+}
+.brandList::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.brandItem {
+  display: flex;
+  align-items: center;
+}
+
+/* --- Custom Checkbox Styling --- */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  color: #555;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  user-select: none;
+  padding: 4px 0;
+}
+
+.checkboxLabel:hover {
+  color: var(--search-button-color, #c38212);
+}
+
+.hiddenInput {
+  display: none; /* Hide default ugly checkbox */
+}
+
+/* The visual box */
+.customCheckbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 6px; /* Soft rounded corners */
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+/* Checked State */
+.hiddenInput:checked + .customCheckbox {
+  background-color: var(--search-button-color, #c38212);
+  border-color: var(--search-button-color, #c38212);
+  box-shadow: 0 2px 5px rgba(195, 130, 18, 0.3);
+}
+
+/* Checkmark Icon Animation */
+.checkIcon {
+  color: white;
+  font-size: 12px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hiddenInput:checked + .customCheckbox .checkIcon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.brandName {
+  font-weight: 500;
+}
+
+/* Hover effect on checkbox box */
+.checkboxLabel:hover .customCheckbox {
+  border-color: var(--search-button-color, #c38212);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .sidebarContainer {
+    position: static;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+  
+  .brandList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+    max-height: none;
+  }
+
+  .brandItem {
+    background: #f9f9f9;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid #eee;
+  }
+}

@@ -1,37 +1,55 @@
-import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { FaShoppingCart, FaStar } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+
+// Actions
 import { getProductById, setQuantity } from "../../store/features/productSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { addToCart } from "../../store/features/cartSlice";
+
+// Components
 import ImageZoomify from "../common/ImageZoomify";
 import QuantityUpdater from "../utils/QuantityUpdater";
-import { FaShoppingCart } from "react-icons/fa";
-import { addToCart } from "../../store/features/cartSlice";
-import { toast, ToastContainer } from "react-toastify";
 import StockStatus from "../utils/StockStatus";
+import ProductImage from "../utils/ProductImage"; // Reused for thumbnails
+import LoadSpinner from "../common/LoadSpinner";
+
+// Styles
+import styles from "./ProductDetails.module.css";
 
 const ProductDetails = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
+
+  // Redux State
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const { product, quantity } = useSelector((state) => state.product);
-  const successMessage = useSelector((state) => state.cart.successMessage);
-  const errorMessage = useSelector((state) => state.cart.errorMessage);
-  const productOutOfStock = product?.inventory <= 0;
+  const { product, quantity, isLoading } = useSelector((state) => state.product);
+  
+  // Local State for Gallery
+  const [activeImageId, setActiveImageId] = useState(null);
 
   useEffect(() => {
     dispatch(getProductById(productId));
   }, [dispatch, productId]);
 
+  // Set default active image when product loads
+  useEffect(() => {
+    if (product?.images?.length > 0) {
+      setActiveImageId(product.images[0].id);
+    }
+  }, [product]);
+
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      toast.error("You need to be logged in to add items to the cart.");
+      toast.error("Please login to shop.");
       return;
     }
     try {
       await dispatch(addToCart({ productId, quantity })).unwrap();
-      toast.success(successMessage);
+      toast.success("Added to cart successfully!");
     } catch (error) {
-      toast.error(errorMessage);
+      toast.error(error.message || "Could not add to cart");
     }
   };
 
@@ -40,56 +58,106 @@ const ProductDetails = () => {
   };
 
   const handleDecreaseQuantity = () => {
-    dispatch(setQuantity(quantity - 1, 1));
+    if (quantity > 1) {
+      dispatch(setQuantity(quantity - 1));
+    }
   };
 
+  if (isLoading) return <LoadSpinner />;
+  if (!product) return <div className="text-center mt-5">Product not found</div>;
+
+  const productOutOfStock = product.inventory <= 0;
+
   return (
-    <div className='container mt-4 mb-4'>
-      <ToastContainer />
-      {product ? (
-        <div className='row product-details'>
-          <div className='col-md-2'>
-            {product.images.map((img) => (
-              <div key={img.id} className='image-container'>
-                <ImageZoomify productId={img.id} />
-              </div>
-            ))}
+    <div className={styles.pageContainer}>
+      <ToastContainer position="bottom-right" />
+      
+      <div className={styles.productGrid}>
+        
+        {/* --- Left: Interactive Gallery --- */}
+        <div className={styles.gallerySection}>
+          {/* Main Large Image */}
+          <div className={styles.mainImageWrapper}>
+            {activeImageId ? (
+              <ImageZoomify productId={activeImageId} />
+            ) : (
+              <span style={{color: '#999'}}>No Image Available</span>
+            )}
           </div>
-          <div className='col-md-8 details-container'>
-            <h1 className='product-name'>{product.name}</h1>
-            <h4 className='price'>${product.price}</h4>
-            <p className='product-description'>{product.description}</p>
-            <p className='product-name'>Brand: {product.brand}</p>
-            <p className='product-name'>
-              Rating: <span className='rating'>some stars</span>
-            </p>
 
-            <StockStatus inventory={product.inventory} />
+          {/* Thumbnail Strip */}
+          {product.images && product.images.length > 1 && (
+            <div className={styles.thumbnailList}>
+              {product.images.map((img) => (
+                <div 
+                  key={img.id}
+                  className={`${styles.thumbnail} ${activeImageId === img.id ? styles.activeThumb : ''}`}
+                  onClick={() => setActiveImageId(img.id)}
+                >
+                  {/* Using ProductImage just to fetch/render the small img tag */}
+                  <ProductImage productId={img.id} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-            <p>Quantity:</p>
-            <QuantityUpdater
-              quantity={quantity}
-              onDecrease={handleDecreaseQuantity}
-              onIncrease={handleIncreaseQuantity}
-              disabled={productOutOfStock}
-            />
-            <div className='d-flex gap-2 mt-3'>
+        {/* --- Right: Product Info --- */}
+        <div className={styles.infoSection}>
+          <span className={styles.brandLabel}>{product.brand || "Generic Brand"}</span>
+          <h1 className={styles.productName}>{product.name}</h1>
+
+          {/* Placeholder Rating */}
+          <div className={styles.ratingRow}>
+            <div className={styles.stars}>
+              <FaStar /><FaStar /><FaStar /><FaStar /><FaStar style={{color: '#ddd'}}/>
+            </div>
+            <span>(4.0 Reviews)</span>
+          </div>
+
+          <div className={styles.priceRow}>
+            <span className={styles.price}>${product.price}</span>
+            <div className={styles.stockLabel}>
+              <StockStatus inventory={product.inventory} />
+            </div>
+          </div>
+
+          <div className={styles.descriptionTitle}>Description</div>
+          <p className={styles.description}>{product.description}</p>
+
+          {/* Actions */}
+          <div className={styles.actionsWrapper}>
+            
+            <div className={styles.qtyWrapper}>
+              <span className={styles.qtyLabel}>Quantity:</span>
+              <QuantityUpdater
+                quantity={quantity}
+                onDecrease={handleDecreaseQuantity}
+                onIncrease={handleIncreaseQuantity}
+                disabled={productOutOfStock}
+              />
+            </div>
+
+            <div className={styles.btnRow}>
               <button
-                className='add-to-cart-button'
+                className={`${styles.addToCartBtn} ${productOutOfStock ? styles.btnDisabled : ''}`}
                 onClick={handleAddToCart}
-                disabled={productOutOfStock}>
-                {" "}
-                <FaShoppingCart /> Add to cart
+                disabled={productOutOfStock}
+              >
+                <FaShoppingCart />
+                {productOutOfStock ? "Out of Stock" : "Add to Cart"}
               </button>
-              <button className='buy-now-button' disabled={productOutOfStock}>
-                Buy now
+              
+              <button 
+                className={`${styles.buyNowBtn} ${productOutOfStock ? styles.btnDisabled : ''}`}
+                disabled={productOutOfStock}
+              >
+                Buy Now
               </button>
             </div>
           </div>
         </div>
-      ) : (
-        <p>No product</p>
-      )}
+      </div>
     </div>
   );
 };

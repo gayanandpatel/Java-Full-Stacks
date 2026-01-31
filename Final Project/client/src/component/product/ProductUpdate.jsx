@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+
+// Actions
 import {
   getProductById,
   updateProduct,
 } from "../../store/features/productSlice";
 import { deleteProductImage } from "../../store/features/imageSlice";
+
+// Components
 import LoadSpinner from "../common/LoadSpinner";
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
-import { toast, ToastContainer } from "react-toastify";
 import ProductImage from "../utils/ProductImage";
 import ImageUpdater from "../image/ImageUpdater";
+
+// Styles
+import styles from "./ProductUpdate.module.css";
 
 const ProductUpdate = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
+  
+  // Local State
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);
@@ -43,11 +53,9 @@ const ProductUpdate = () => {
         const result = await dispatch(getProductById(productId)).unwrap();
         setUpdatedProduct(result);
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error.message || "Failed to fetch product");
       } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1000);
+        setIsLoading(false);
       }
     };
     fetchProduct();
@@ -62,20 +70,12 @@ const ProductUpdate = () => {
 
   const handleBrandChange = (brand) => {
     setUpdatedProduct({ ...updatedProduct, brand });
-    if (brand === "New") {
-      setShowNewBrandInput(true);
-    } else {
-      setShowNewBrandInput(false);
-    }
+    setShowNewBrandInput(brand === "New");
   };
 
   const handleCategoryChange = (category) => {
     setUpdatedProduct({ ...updatedProduct, category });
-    if (category === "New") {
-      setShowNewCategoryInput(true);
-    } else {
-      setShowNewCategoryInput(false);
-    }
+    setShowNewCategoryInput(category === "New");
   };
 
   const handleUpdateProduct = async (e) => {
@@ -84,13 +84,15 @@ const ProductUpdate = () => {
       const result = await dispatch(
         updateProduct({ productId, updatedProduct })
       ).unwrap();
-      toast.success(result.message);
+      toast.success(result.message || "Product updated successfully");
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Update failed");
     }
   };
 
   const handleDeleteImage = async (imageId) => {
+    if(!window.confirm("Are you sure you want to delete this image?")) return;
+
     try {
       const result = await dispatch(deleteProductImage({ imageId })).unwrap();
       toast.success(result.message);
@@ -102,10 +104,6 @@ const ProductUpdate = () => {
     } catch (error) {
       toast.error(error.message);
     }
-  };
-
-  const handleImageUpdate = () => {
-    dispatch(getProductById(productId));
   };
 
   const handleEditImage = (imageId) => {
@@ -128,51 +126,57 @@ const ProductUpdate = () => {
   }
 
   return (
-    <div className='container mt-5 mb-5'>
-      <ToastContainer />
-      <div className='row'>
-        <div className='col-md-6 me-4'>
-          <h4 className='mb-4'> Update Product</h4>
-          <form onSubmit={handleUpdateProduct}>
-            <div className='mb-3'>
-              <label className='form-label'>Name :</label>
+    <div className={styles.container}>
+      <ToastContainer position="top-right" />
+      
+      <div className={styles.header}>
+        <h2 className={styles.title}>Update Product</h2>
+      </div>
 
+      <div className={styles.layoutGrid}>
+        
+        {/* --- LEFT: Product Form --- */}
+        <div className={styles.formSection}>
+          <form onSubmit={handleUpdateProduct}>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="name" className={styles.label}>Product Name</label>
               <input
-                className='form-control'
-                type='text'
-                id='name'
-                name='name'
+                className={styles.input}
+                type="text"
+                id="name"
+                name="name"
                 value={updatedProduct.name}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className='mb-3'>
-              <label className='form-label'>Price:</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="price" className={styles.label}>Price ($)</label>
               <input
-                type='number'
-                className='form-control'
-                name='price'
+                type="number"
+                className={styles.input}
+                name="price"
                 value={updatedProduct.price}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className='mb-3'>
-              <label className='form-label'>Inventory:</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="inventory" className={styles.label}>Inventory Stock</label>
               <input
-                type='number'
-                className='form-control'
-                name='inventory'
+                type="number"
+                className={styles.input}
+                name="inventory"
                 value={updatedProduct.inventory}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <div className='mb-3'>
+            <div className={styles.formGroup}>
               <BrandSelector
                 selectedBrand={updatedProduct.brand}
                 onBrandChange={handleBrandChange}
@@ -182,9 +186,10 @@ const ProductUpdate = () => {
                 setNewBrand={setNewBrand}
               />
             </div>
-            <div className='mb-3'>
+
+            <div className={styles.formGroup}>
               <CategorySelector
-                selectedCategory={updatedProduct.category.name}
+                selectedCategory={updatedProduct.category?.name || ""} 
                 onCategoryChange={handleCategoryChange}
                 showNewCategoryInput={showNewCategoryInput}
                 setShowNewCategoryInput={setShowNewCategoryInput}
@@ -193,49 +198,66 @@ const ProductUpdate = () => {
               />
             </div>
 
-            <div className='mb-3'>
-              <label className='form-label'>Description:</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="description" className={styles.label}>Description</label>
               <textarea
-                className='form-control'
-                name='description'
+                className={styles.textarea}
+                name="description"
                 value={updatedProduct.description}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <button type='submit' className='btn btn-secondary btn-sm'>
-              Save product update
+            <button type="submit" className={styles.submitBtn}>
+              Save Changes
             </button>
           </form>
         </div>
 
-        <div className='col-md-3'>
-          <table className='table table-bordered text-center'>
-            <tbody>
-              {updatedProduct.images.map((image, index) => (
-                <tr key={index}>
-                  <td className='update-image-container'>
+        {/* --- RIGHT: Image Manager --- */}
+        <div className={styles.imageSection}>
+          <h4 className={styles.sectionTitle}>Product Images</h4>
+          
+          <div className={styles.imageList}>
+            {updatedProduct.images && updatedProduct.images.length > 0 ? (
+              updatedProduct.images.map((image, index) => (
+                <div key={index} className={styles.imageCard}>
+                  <div className={styles.imageWrapper}>
                     <ProductImage productId={image.id} />
+                  </div>
+                  
+                  <div className={styles.imageActions}>
+                    <button 
+                      type="button" 
+                      className={`${styles.actionBtn} ${styles.editBtn}`}
+                      onClick={() => handleEditImage(image.id)}
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    
+                    <button 
+                      type="button" 
+                      className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                      onClick={() => handleDeleteImage(image.id)}
+                    >
+                      <FaTrash /> Remove
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted text-center py-4">No images uploaded yet.</p>
+            )}
+          </div>
 
-                    <div className='d-flex gap-4 mb-2 mt-2'>
-                      <Link to={"#"} onClick={() => handleEditImage(image.id)}>
-                        edit
-                      </Link>
-                      <Link
-                        to={"#"}
-                        onClick={() => handleDeleteImage(image.id)}>
-                        remove
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Link to={"#"} onClick={() => handleAddImage(productId)}>
-            Add Image
-          </Link>
+          <button 
+            type="button" 
+            className={styles.addImageBtn} 
+            onClick={handleAddImage}
+          >
+            <FaPlus style={{marginRight: '5px'}}/> Add New Image
+          </button>
         </div>
       </div>
 

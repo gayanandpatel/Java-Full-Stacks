@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Button, Modal } from "react-bootstrap";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   uploadImages,
   updateProductImage,
 } from "../../store/features/imageSlice";
+
+// Import styles
+import styles from "./ImageUpdater.module.css";
 
 const ImageUpdater = ({
   show,
@@ -20,12 +22,16 @@ const ImageUpdater = ({
   const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
-    if (selectedImage) {
-      setImagePreview(selectedImage.imageUrl);
-    } else {
-      setImagePreview(null);
+    if (show) {
+      // Reset state when modal opens
+      if (selectedImage) {
+        setImagePreview(selectedImage.imageUrl);
+      } else {
+        setImagePreview(null);
+      }
+      setSelectedFile(null);
     }
-  }, [selectedImage]);
+  }, [show, selectedImage]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -43,68 +49,87 @@ const ImageUpdater = ({
 
   const handleImageAction = async () => {
     if (!selectedFile) {
-      toast.warn("Please select an image.");
+      toast.warn("Please select an image first.");
       return;
     }
+    
     try {
       let result;
       if (selectedImageId) {
+        // Update existing image
         result = await dispatch(
           updateProductImage({ imageId: selectedImageId, file: selectedFile })
         ).unwrap();
       } else {
+        // Upload new image
         result = await dispatch(
-          uploadImages({ productId, files: selectedFile })
+          uploadImages({ productId, files: [selectedFile] }) // API expects array
         ).unwrap();
       }
-      toast.success(result.message);
+      toast.success(result.message || "Operation successful");
       handleClose();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to upload image");
     }
   };
 
+  if (!show) return null;
+
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton style={{ backgroundColor: "whitesmoke" }}>
-        <Modal.Title>
-          {selectedImageId ? "Update Product Image" : "Add Product Image"}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div>
-          <p>
+    <div className={styles.overlay} onClick={handleClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        
+        {/* Header */}
+        <div className={styles.header}>
+          <h3 className={styles.title}>
+            {selectedImageId ? "Update Product Image" : "Add Product Image"}
+          </h3>
+          <button className={styles.closeBtn} onClick={handleClose}>
+            &times;
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className={styles.body}>
+          <p className={styles.instruction}>
             {selectedImageId
               ? "Select a new image to replace the current one:"
-              : "Select the image to be added:"}
+              : "Select a new image to upload:"}
           </p>
+          
           <input
-            type='file'
-            accept='image/*'
-            className='form-control'
+            type="file"
+            accept="image/*"
+            className={styles.fileInput}
             ref={fileInputRef}
             onChange={handleFileChange}
           />
-          <div className='image-preview-container'>
-            {imagePreview && (
+
+          <div className={styles.previewContainer}>
+            {imagePreview ? (
               <img
                 src={imagePreview}
-                alt='Image Preview'
-                className='img-fluid image-preview'
+                alt="Preview"
+                className={styles.previewImage}
               />
+            ) : (
+              <span className={styles.placeholderText}>No image selected</span>
             )}
           </div>
         </div>
-      </Modal.Body>
-      <Modal.Footer style={{ backgroundColor: "whitesmoke" }}>
-        <Button variant='secondary' onClick={handleClose}>
-          Close
-        </Button>
-        <Button variant='secondary' onClick={handleImageAction}>
-          {selectedImageId ? "Save Changes" : "Upload Image"}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+
+        {/* Footer */}
+        <div className={styles.footer}>
+          <button className={`${styles.btn} ${styles.cancelBtn}`} onClick={handleClose}>
+            Cancel
+          </button>
+          <button className={`${styles.btn} ${styles.actionBtn}`} onClick={handleImageAction}>
+            {selectedImageId ? "Save Changes" : "Upload Image"}
+          </button>
+        </div>
+
+      </div>
+    </div>
   );
 };
 

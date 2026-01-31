@@ -1,0 +1,64 @@
+/* Paginator.module.css */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 40px 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.pageBtn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #555;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.pageBtn:hover {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+  color: #333;
+  transform: translateY(-2px);
+}
+
+.active {
+  background-color: var(--search-button-color, #c38212);
+  color: white;
+  border-color: var(--search-button-color, #c38212);
+  box-shadow: 0 4px 10px rgba(195, 130, 18, 0.3);
+}
+
+.active:hover {
+  background-color: #a86e0d;
+  border-color: #a86e0d;
+  color: white;
+}
+
+/* Optional: Disabled state if you add Prev/Next buttons later */
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (max-width: 500px) {
+  .pageBtn {
+    min-width: 35px;
+    height: 35px;
+    font-size: 0.85rem;
+    padding: 0 8px;
+  }
+}

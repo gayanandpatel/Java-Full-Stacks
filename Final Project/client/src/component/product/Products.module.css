@@ -1,0 +1,79 @@
+/* Products.module.css */
+
+.pageContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #333;
+}
+
+/* Search Bar Section */
+.searchSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.searchWrapper {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Main Layout: Sidebar + Grid */
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 260px 1fr; /* Fixed sidebar width, remaining for products */
+  gap: 40px;
+  align-items: start;
+  position: relative;
+}
+
+/* Sidebar Styling */
+.sidebarWrapper {
+  position: sticky;
+  top: 100px; /* Adjust based on navbar height */
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  padding: 20px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+/* Scrollbar for sidebar */
+.sidebarWrapper::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebarWrapper::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+/* Product Section */
+.productSection {
+  width: 100%;
+  min-height: 500px; /* Prevent collapse if empty */
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .layoutGrid {
+    grid-template-columns: 1fr; /* Stack layout on smaller screens */
+  }
+
+  .sidebarWrapper {
+    position: static;
+    margin-bottom: 30px;
+    max-height: none;
+    box-shadow: none;
+    border: 1px solid #eee;
+  }
+}
+
+@media (max-width: 600px) {
+  .pageContainer {
+    padding: 20px 10px;
+  }
+}

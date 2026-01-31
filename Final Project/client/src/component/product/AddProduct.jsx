@@ -1,23 +1,31 @@
 import React, { useState } from "react";
-import { addNewProduct } from "../../store/features/productSlice";
 import { useDispatch } from "react-redux";
+import { Stepper, Step, StepLabel } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
+import { addNewProduct } from "../../store/features/productSlice";
+
+// Child Components
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
-import { Stepper, Step, StepLabel } from "@mui/material";
 import ImageUploader from "../common/ImageUploader";
+
+// Import styles
+import styles from "./AddProduct.module.css";
 
 const AddProduct = () => {
   const dispatch = useDispatch();
+  
+  // Local State
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newBrand, setNewBrand] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [activeStep, setActiveStep] = useState(0);
-  const steps = ["Add New Product", "Upload Product Image"];
   const [productId, setProductId] = useState(null);
 
-  const [product, setProduct] = React.useState({
+  const steps = ["Product Details", "Upload Images"];
+
+  const [product, setProduct] = useState({
     name: "",
     description: "",
     price: "",
@@ -26,6 +34,7 @@ const AddProduct = () => {
     inventory: "",
   });
 
+  // Handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct((prevState) => ({
@@ -36,33 +45,24 @@ const AddProduct = () => {
 
   const handleCategoryChange = (category) => {
     setProduct({ ...product, category });
-    if (category === "New") {
-      setShowNewCategoryInput(true);
-    } else {
-      setShowNewCategoryInput(false);
-    }
+    setShowNewCategoryInput(category === "New");
   };
 
   const handleBrandChange = (brand) => {
     setProduct({ ...product, brand });
-    if (brand === "New") {
-      setShowNewBrandInput(true);
-    } else {
-      setShowNewBrandInput(false);
-    }
+    setShowNewBrandInput(brand === "New");
   };
 
   const handleAddNewProduct = async (e) => {
     e.preventDefault();
     try {
       const result = await dispatch(addNewProduct(product)).unwrap();
-      console.log("The add product result : ", result);
       setProductId(result.id);
-      toast.success(result.message);
+      toast.success("Product added successfully!");
       resetForm();
-      setActiveStep(1);
+      setActiveStep(1); // Move to Image Upload step
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to add product");
     }
   };
 
@@ -84,120 +84,130 @@ const AddProduct = () => {
   };
 
   return (
-    <section className='container mt-5 mb-5'>
-      <ToastContainer />
-      <div className='d-flex justify-content-center'>
-        <div className='col-md-6 col-xs-12'>
-          <h4>Add New Product</h4>
-          <Stepper activeStep={activeStep} className='mb-4'>
+    <section className={styles.pageContainer}>
+      <ToastContainer position="top-center" />
+      
+      <div className={styles.formCard}>
+        <h2 className={styles.title}>Add New Product</h2>
+        
+        {/* Stepper Navigation */}
+        <div className={styles.stepperContainer}>
+          <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
               </Step>
             ))}
           </Stepper>
-
-          <div>
-            {activeStep === 0 && (
-              <form onSubmit={handleAddNewProduct}>
-                <div className='mb-3'>
-                  <label htmlFor='name' className='form-label'>
-                    Name:
-                  </label>
-                  <input
-                    className='form-control'
-                    type='text'
-                    id='name'
-                    name='name'
-                    value={product.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className='mb-3'>
-                  <label htmlFor='name' className='form-label'>
-                    Price:
-                  </label>
-                  <input
-                    className='form-control'
-                    type='number'
-                    id='price'
-                    name='price'
-                    value={product.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className='mb-3'>
-                  <label htmlFor='name' className='form-label'>
-                    Inventory:
-                  </label>
-                  <input
-                    className='form-control'
-                    type='number'
-                    id='inventory'
-                    name='inventory'
-                    value={product.inventory}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className='mb-3'>
-                  <BrandSelector
-                    selectedBrand={product.brand}
-                    onBrandChange={handleBrandChange}
-                    showNewBrandInput={showNewBrandInput}
-                    setShowNewBrandInput={setShowNewBrandInput}
-                    newBrand={newBrand}
-                    setNewBrand={setNewBrand}
-                  />
-                </div>
-
-                <div className='mb-3'>
-                  <CategorySelector
-                    selectedCategory={product.category}
-                    onCategoryChange={handleCategoryChange}
-                    showNewCategoryInput={showNewCategoryInput}
-                    setShowNewCategoryInput={setShowNewCategoryInput}
-                    newCategory={newCategory}
-                    setNewCategory={setNewCategory}
-                  />
-                </div>
-
-                <div className='mb-3'>
-                  <label htmlFor='name' className='form-label'>
-                    Description:
-                  </label>
-                  <textarea
-                    className='form-control'
-                    id='description'
-                    name='description'
-                    value={product.description}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <button type='submit' className='btn btn-secondary btn-sm'>
-                  Save Product
-                </button>
-              </form>
-            )}
-            {activeStep === 1 && (
-              <div className='container'>
-                <ImageUploader productId={productId} />
-                <button
-                  className='btn btn-secondary btn-s mt-3'
-                  onClick={handlePreviousStep}>
-                  Previous
-                </button>
-              </div>
-            )}
-          </div>
         </div>
+
+        {/* STEP 1: Product Details Form */}
+        {activeStep === 0 && (
+          <form onSubmit={handleAddNewProduct} className={styles.form}>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="name" className={styles.label}>Product Name</label>
+              <input
+                className={styles.input}
+                type="text"
+                id="name"
+                name="name"
+                value={product.name}
+                onChange={handleChange}
+                placeholder="e.g. Wireless Headphones"
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="price" className={styles.label}>Price ($)</label>
+              <input
+                className={styles.input}
+                type="number"
+                id="price"
+                name="price"
+                value={product.price}
+                onChange={handleChange}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="inventory" className={styles.label}>Inventory Count</label>
+              <input
+                className={styles.input}
+                type="number"
+                id="inventory"
+                name="inventory"
+                value={product.inventory}
+                onChange={handleChange}
+                placeholder="Available stock"
+                min="0"
+                required
+              />
+            </div>
+
+            {/* Child components handle their own layout, but fit within our flex column */}
+            <BrandSelector
+              selectedBrand={product.brand}
+              onBrandChange={handleBrandChange}
+              showNewBrandInput={showNewBrandInput}
+              setShowNewBrandInput={setShowNewBrandInput}
+              newBrand={newBrand}
+              setNewBrand={setNewBrand}
+            />
+
+            <CategorySelector
+              selectedCategory={product.category}
+              onCategoryChange={handleCategoryChange}
+              showNewCategoryInput={showNewCategoryInput}
+              setShowNewCategoryInput={setShowNewCategoryInput}
+              newCategory={newCategory}
+              setNewCategory={setNewCategory}
+            />
+
+            <div className={styles.formGroup}>
+              <label htmlFor="description" className={styles.label}>Description</label>
+              <textarea
+                className={styles.textarea}
+                id="description"
+                name="description"
+                value={product.description}
+                onChange={handleChange}
+                placeholder="Enter product details..."
+                required
+              />
+            </div>
+
+            <button type="submit" className={styles.submitBtn}>
+              Save & Continue to Images
+            </button>
+          </form>
+        )}
+
+        {/* STEP 2: Image Upload */}
+        {activeStep === 1 && (
+          <div className={styles.stepContainer}>
+            <p className={styles.stepTitle}>
+              Upload images for your product (ID: {productId})
+            </p>
+            
+            <ImageUploader productId={productId} />
+            
+            <div className={styles.btnGroup} style={{ justifyContent: 'center', marginTop: '30px' }}>
+              <button
+                className={styles.prevBtn}
+                onClick={handlePreviousStep}
+              >
+                Back to Details
+              </button>
+              {/* Optional: Add a "Finish" button that redirects to product list */}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

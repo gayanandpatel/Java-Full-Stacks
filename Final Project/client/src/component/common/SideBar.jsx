@@ -4,6 +4,10 @@ import {
   getAllBrands,
   filterByBrands,
 } from "../../store/features/productSlice";
+import { FaCheck } from "react-icons/fa";
+
+// Import styles
+import styles from "./SideBar.module.css";
 
 const SideBar = () => {
   const dispatch = useDispatch();
@@ -16,28 +20,35 @@ const SideBar = () => {
   const handleBrandChange = (brand, isChecked) => {
     dispatch(filterByBrands({ brand, isChecked }));
   };
-  
 
   return (
-    <>
-      <h6>Filter by Brand</h6>
+    <aside className={styles.sidebarContainer}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>Filter by Brand</h3>
+      </div>
 
-      <ul className='brand-list'>
+      <ul className={styles.brandList}>
         {brands.map((brand, index) => (
-          <li key={index} className='brand-item'>
-            <label className='checkbox-container'>
+          <li key={index} className={styles.brandItem}>
+            <label className={styles.checkboxLabel}>
               <input
-                type='checkbox'
+                type="checkbox"
+                className={styles.hiddenInput}
                 checked={selectedBrands.includes(brand)}
                 onChange={(e) => handleBrandChange(brand, e.target.checked)}
               />
-              <span className='checkmark'></span>
-              {brand}
+              
+              {/* Custom Checkbox UI */}
+              <span className={styles.customCheckbox}>
+                <FaCheck className={styles.checkIcon} />
+              </span>
+              
+              <span className={styles.brandName}>{brand}</span>
             </label>
           </li>
         ))}
       </ul>
-    </>
+    </aside>
   );
 };
 

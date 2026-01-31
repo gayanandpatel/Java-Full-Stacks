@@ -1,0 +1,134 @@
+/* ImageUploader.module.css */
+
+.container {
+  margin-top: 1.5rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Add Button (Link style) */
+.addMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--search-button-color, #c38212);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  padding: 0;
+}
+
+.addMoreBtn:hover {
+  color: #a86e0d;
+  text-decoration: underline;
+}
+
+/* Input List Area */
+.inputList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  transition: border-color 0.2s;
+}
+
+.inputGroup:hover {
+  border-color: #ddd;
+}
+
+/* File Input styling */
+.fileInput {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.fileInput::file-selector-button {
+  margin-right: 15px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: #e0e0e0;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.fileInput::file-selector-button:hover {
+  background-color: #d0d0d0;
+}
+
+/* Remove Button */
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ffebee;
+  color: #c62828;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeBtn:hover {
+  background-color: #c62828;
+  color: white;
+}
+
+/* Upload Action Button */
+.uploadBtn {
+  padding: 12px 24px;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: inline-block;
+}
+
+.uploadBtn:hover {
+  background-color: var(--search-button-color, #c38212);
+  transform: translateY(-2px);
+}
+
+.icon {
+  font-size: 1.2rem;
+}
