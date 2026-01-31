@@ -7,9 +7,7 @@ const initialState = {
 
 const searchSlice = createSlice({
   name: "search",
-
   initialState,
-
   reducers: {
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
@@ -17,12 +15,17 @@ const searchSlice = createSlice({
     setSelectedCategory: (state, action) => {
       state.selectedCategory = action.payload;
     },
-    clearFilters: (state) => {
+    setInitialSearchQuery: (state, action) => {
+      state.searchQuery = action.payload;
+    },
+    resetSearchState: (state) => {
       state.searchQuery = "";
       state.selectedCategory = "all";
     },
-    setInitialSearchQuery: (state, action) => {
-      state.searchQuery = action.payload;
+    // Alias for backward compatibility if you prefer 'clearFilters'
+    clearFilters: (state) => {
+      state.searchQuery = "";
+      state.selectedCategory = "all";
     },
   },
 });
@@ -30,8 +33,15 @@ const searchSlice = createSlice({
 export const {
   setSearchQuery,
   setSelectedCategory,
-  clearFilters,
   setInitialSearchQuery,
+  resetSearchState,
+  clearFilters,
 } = searchSlice.actions;
+
+// --- Selectors ---
+// Using selectors is better practice than state.search.searchQuery in components
+export const selectSearchQuery = (state) => state.search.searchQuery;
+export const selectSelectedCategory = (state) => state.search.selectedCategory;
+export const selectSearchState = (state) => state.search;
 
 export default searchSlice.reducer;
