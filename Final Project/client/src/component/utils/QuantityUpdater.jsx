@@ -1,35 +1,42 @@
 import React from "react";
 import { BsDash, BsPlus } from "react-icons/bs";
 
+// Import styles
+import styles from "./QuantityUpdater.module.css";
+
 const QuantityUpdater = ({ disabled, quantity, onIncrease, onDecrease }) => {
   return (
-    <section style={{ width: "150px" }}>
-      <div className='input-group'>
-        <button
-          onClick={onDecrease}
-          className='btn btn-outline-secondary'
-          disabled={disabled}>
-          {" "}
-          <BsDash />
-        </button>
+    <div className={`${styles.wrapper} ${disabled ? styles.disabledWrapper : ''}`}>
+      <button
+        onClick={onDecrease}
+        className={styles.btn}
+        disabled={disabled || quantity <= 1} // Disable minus if quantity is 1
+        aria-label="Decrease quantity"
+        type="button"
+      >
+        <BsDash size={18} />
+      </button>
 
-        <input
-          name='quantity'
-          type='number'
-          value={quantity}
-          readOnly
-          disabled={disabled}
-          className='form-control text-center'></input>
+      <input
+        name="quantity"
+        type="number"
+        value={quantity}
+        readOnly
+        disabled={disabled}
+        className={styles.input}
+        aria-label="Quantity"
+      />
 
-        <button
-          onClick={onIncrease}
-          className='btn btn-outline-secondary'
-          disabled={disabled}>
-          {" "}
-          <BsPlus />
-        </button>
-      </div>
-    </section>
+      <button
+        onClick={onIncrease}
+        className={styles.btn}
+        disabled={disabled}
+        aria-label="Increase quantity"
+        type="button"
+      >
+        <BsPlus size={18} />
+      </button>
+    </div>
   );
 };
 

@@ -2,15 +2,21 @@ export const cardElementOptions = {
   style: {
     base: {
       fontSize: "16px",
-      color: "#32325d",
-      fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+      color: "#111111", // Darker, sharper text
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif", // Matches your app font
+      fontSmoothing: "antialiased",
       "::placeholder": {
-        color: "#aab7c4",
+        color: "#888888", // Subtle placeholder
       },
+      iconColor: "#c38212", // Your Brand Orange
     },
     invalid: {
-      color: "#fa755a",
-      iconColor: "#fa755a",
+      color: "#dc2626", // Standard Error Red
+      iconColor: "#dc2626",
+    },
+    complete: {
+      color: "#2e7d32", // Success Green
+      iconColor: "#2e7d32",
     },
   },
   hidePostalCode: true,
