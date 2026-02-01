@@ -2,17 +2,20 @@ import React, { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  clearCart,
   getUserCart,
   updateQuantity,
   removeItemFromCart,
 } from "../../store/features/cartSlice";
-import { Card } from "react-bootstrap";
 import ProductImage from "../utils/ProductImage";
 import QuantityUpdater from "../utils/QuantityUpdater";
 import LoadSpinner from "../common/LoadSpinner";
 import { toast, ToastContainer } from "react-toastify";
 
+// Import Icons
+import { FaTrash } from "react-icons/fa"; 
+
+// Import CSS Module
+import styles from "./Cart.module.css";
 
 const Cart = () => {
   const { userId } = useParams();
@@ -21,7 +24,6 @@ const Cart = () => {
   const cart = useSelector((state) => state.cart);
   const cartId = useSelector((state) => state.cart.cartId);
   const isLoading = useSelector((state) => state.cart.isLoading);
-  const { successMessage, errorMessage } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(getUserCart(userId));
@@ -63,94 +65,126 @@ const Cart = () => {
   };
 
   const handlePlaceOrder = async () => {
-   navigate(`/checkout/${userId}/checkout`)
+    navigate(`/checkout/${userId}/checkout`);
   };
-
-
-  
 
   if (isLoading) {
     return <LoadSpinner />;
   }
 
   return (
-    <div className='container mt-5 mb-5 p-5'>
+    <div className={styles.wrapper}>
       <ToastContainer />
 
       {cart.items.length === 0 ? (
-        <>
-          <h3 className='mb-4 cart-title'>Your cart is empty</h3>
-          <Link to={"/products"}>Continue Shopping</Link>
-        </>
+        <div className={styles.emptyState}>
+          <h3>Your cart is empty</h3>
+          <Link to={"/products"} className={styles.checkoutBtn} style={{ maxWidth: '200px', margin: '0 auto' }}>
+            Start Shopping
+          </Link>
+        </div>
       ) : (
-        <div className='d-flex flex-column'>
-          <div className='d-flex justify-content-between mb-4 fw-bold'>
-            <div className='text-center'>Image</div>
-            <div className='text-center'>Name</div>
-            <div className='text-center'>Brand</div>
-            <div className='text-center'>Price</div>
-            <div className='text-center'>Quantity</div>
-            <div className='text-center'>Total Price</div>
-            <div className='text-center'> Action</div>
-          </div>
-          <hr className='mb-2 mt-2' />
+        <>
+          <h2 className={styles.heading}>Shopping Cart ({cart.items.length} items)</h2>
+          
+          <div className={styles.layout}>
+            {/* Left Column: Cart Items */}
+            <div className={styles.cartList}>
+              {/* Desktop Header */}
+              <div className={`d-none d-md-grid ${styles.headerRow}`}>
+                <div>Product</div>
+                <div>Description</div>
+                <div>Brand</div>
+                <div>Quantity</div>
+                <div>Total</div>
+                <div></div> {/* Action Column Header */}
+              </div>
 
-          <h3 className='mb-4 cart-title'>My Shopping Cart</h3>
-
-          {cart.items.map((item, index) => (
-            <Card key={index} className='mb-4'>
-              <Card.Body className='d-flex justify-content-between align-items-center shadow'>
-                <div className='d-flex align-items-center'>
-                  <Link to={"#"}>
-                    <div className='cart-image-container'>
+              {cart.items.map((item, index) => (
+                <div key={index} className={styles.cartItem}>
+                  {/* Image Column */}
+                  <div className={styles.imageWrapper}>
+                    <Link to={`/products/${item.product?.id}`}>
                       {item.product?.images?.length > 0 && (
                         <ProductImage productId={item.product?.images[0].id} />
                       )}
-                    </div>
-                  </Link>
-                </div>
+                    </Link>
+                  </div>
 
-                <div className='text-center'>{item.product?.name}</div>
-                <div className='text-center'>{item.product?.brand}</div>
-                <div className='text-center'>
-                  ${item.product?.price?.toFixed(2)}
-                </div>
-                <div className='text-center'>
-                  <QuantityUpdater
-                    quantity={item.quantity}
-                    onDecrease={() => handleDecreaseQuantity(item.product.id)}
-                    onIncrease={() => handleIncreaseQuantity(item.product.id)}
-                  />
-                </div>
-                <div className='text-center'>
-                  ${item.totalPrice?.toFixed(2)}
-                </div>
-                <div>
-                  <Link
-                    to={"#"}
-                    onClick={() => handleRemoveItem(item.product.id)}>
-                    <span className='remove-item'>Remove</span>
-                  </Link>
-                </div>
-              </Card.Body>
-            </Card>
-          ))}
+                  {/* Name Column */}
+                  <div className={styles.itemMeta}>
+                    <Link to={`/products/${item.product?.id}`} className={styles.itemName}>
+                      {item.product?.name}
+                    </Link>
+                    <span className="d-md-none text-muted">{item.product?.brand}</span>
+                    <span className="d-md-none mt-2">${item.product?.price?.toFixed(2)} / unit</span>
+                  </div>
 
-          <hr />
+                  {/* Brand Column (Desktop) */}
+                  <div className={`d-none d-md-block ${styles.itemBrand}`}>
+                    {item.product?.brand}
+                  </div>
 
-          <div className='cart-footer d-flex align-items-center mt-4'>
-            <h4 className='mb-0 cart-title'>
-              Total Cart Amount: ${cart.totalAmount?.toFixed(2)}
-            </h4>
-            <div className='ms-auto checkout-links'>
-              <Link to={"/products"}>Continue Shopping</Link>
+                   {/* Quantity Column */}
+                  <div>
+                    <QuantityUpdater
+                      quantity={item.quantity}
+                      onDecrease={() => handleDecreaseQuantity(item.product.id)}
+                      onIncrease={() => handleIncreaseQuantity(item.product.id)}
+                    />
+                  </div>
 
-              <Link to={"#"} onClick={handlePlaceOrder}>
+                  {/* Total Price Column */}
+                  <div className={styles.totalPrice}>
+                    ${item.totalPrice?.toFixed(2)}
+                  </div>
+
+                  {/* Action Column - FIXED: Using FaTrash Icon */}
+                  <div className="text-end">
+                    <button 
+                      className={styles.removeBtn} 
+                      onClick={() => handleRemoveItem(item.product.id)}
+                      title="Remove Item"
+                    >
+                      <FaTrash size={16} /> 
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right Column: Order Summary */}
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryHeader}>Order Summary</div>
+              
+              <div className={styles.summaryRow}>
+                <span>Subtotal</span>
+                <span className="fw-bold">${cart.totalAmount?.toFixed(2)}</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>Shipping</span>
+                <span className="text-success">Free</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>Tax estimate</span>
+                <span>$0.00</span>
+              </div>
+
+              <div className={styles.summaryTotal}>
+                <span>Total</span>
+                <span>${cart.totalAmount?.toFixed(2)}</span>
+              </div>
+
+              <button onClick={handlePlaceOrder} className={styles.checkoutBtn}>
                 Proceed to Checkout
+              </button>
+              
+              <Link to={"/products"} className={styles.continueLink}>
+                or Continue Shopping
               </Link>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

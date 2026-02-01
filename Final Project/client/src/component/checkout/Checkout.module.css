@@ -20,7 +20,7 @@
 /* --- Layout Grid --- */
 .layoutGrid {
   display: grid;
-  grid-template-columns: 1.8fr 1fr; /* Form takes nearly 2/3, Summary takes rest */
+  grid-template-columns: 1.8fr 1fr;
   gap: 40px;
   align-items: start;
 }
@@ -56,6 +56,92 @@
   font-size: 0.9rem;
 }
 
+/* --- Saved Address Selector --- */
+.savedAddressContainer {
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
+}
+
+.subLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.addressCard {
+  background: white;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.addressCard:hover {
+  border-color: #ccc;
+  transform: translateY(-2px);
+}
+
+/* The Active (Selected) State */
+.activeCard {
+  border-color: var(--search-button-color, #c38212);
+  background-color: #fffaf0;
+  box-shadow: 0 4px 12px rgba(195, 130, 18, 0.15);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.addrType {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.addrText {
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.4;
+}
+
+.dividerText {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0 0 0;
+  color: #999;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.dividerText::before, .dividerText::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+.dividerText span {
+  padding: 0 10px;
+}
+
+/* --- Form Fields --- */
 .row {
   display: flex;
   gap: 20px;
@@ -123,7 +209,7 @@
   padding: 30px;
   border: 1px solid #eee;
   position: sticky;
-  top: 100px; /* Sticks when scrolling */
+  top: 100px;
 }
 
 .summaryTitle {
@@ -183,9 +269,8 @@
 /* --- Responsive --- */
 @media (max-width: 992px) {
   .layoutGrid {
-    grid-template-columns: 1fr; /* Stack columns on tablet/mobile */
+    grid-template-columns: 1fr;
   }
-  
   .summaryCard {
     position: static;
   }

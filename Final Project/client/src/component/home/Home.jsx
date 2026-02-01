@@ -13,6 +13,7 @@ import StockStatus from "../utils/StockStatus";
 // State Actions
 import { setTotalItems } from "../../store/features/paginationSlice";
 import { getDistinctProductsByName } from "../../store/features/productSlice";
+import { resetSearchState } from "../../store/features/searchSlice"; 
 
 // Styling
 import styles from "./Home.module.css";
@@ -27,12 +28,17 @@ const Home = () => {
   const { itemsPerPage, currentPage } = useSelector((state) => state.pagination);
   const isLoading = useSelector((state) => state.product.isLoading);
 
+  // 1. Initial Fetch & Reset Filters
   useEffect(() => {
+    // Reset search filters so the homepage is always clean
+    dispatch(resetSearchState());
     dispatch(getDistinctProductsByName());
   }, [dispatch]);
 
-  // Filtering Logic
+  // 2. Filtering Logic (Client-side)
   useEffect(() => {
+    if (!products) return;
+
     const results = products.filter((product) => {
       const matchesQuery = product.name
         .toLowerCase()
@@ -48,7 +54,7 @@ const Home = () => {
     setFilteredProducts(results);
   }, [searchQuery, selectedCategory, products]);
 
-  // Pagination Logic
+  // 3. Pagination Logic
   useEffect(() => {
     dispatch(setTotalItems(filteredProducts.length));
   }, [filteredProducts, dispatch]);
@@ -71,47 +77,70 @@ const Home = () => {
       <div className={styles.container}>
         <ToastContainer />
         
+        <div className={styles.sectionHeader}>
+            <h2>Featured Products</h2>
+            <p>Check out our latest collections</p>
+        </div>
+
         {currentProducts.length === 0 ? (
-          <div className="text-center mt-5">
+          <div className={styles.emptyState}>
+             <img 
+               src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" 
+               alt="No results" 
+               width="80" 
+               style={{opacity: 0.5, marginBottom: '20px'}}
+             />
              <h3>No products found.</h3>
+             <p className="text-muted">We couldn't find what you're looking for.</p>
+             <button 
+                className={styles.resetBtn}
+                onClick={() => dispatch(resetSearchState())}
+             >
+                Show All Products
+             </button>
           </div>
         ) : (
           <div className={styles.grid}>
             {currentProducts.map((product) => (
               <div key={product.id} className={styles.card}>
                 
-                {/* Image Section */}
-                <Link to={`/products/${product.name}`} className={styles.imageWrapper}>
+                {/* Image Section - CHANGED: Links to details page */}
+                <Link to={`/product/${product.id}/details`} className={styles.imageWrapper}>
                   {product.images.length > 0 ? (
-                     // Assuming ProductImage renders an <img> tag, the CSS will handle it
                     <ProductImage productId={product.images[0].id} />
                   ) : (
                     <div className="text-muted">No Image</div>
                   )}
+                  {/* Overlay Action */}
+                  <div className={styles.overlay}>
+                      <span>View Details</span>
+                  </div>
                 </Link>
 
                 {/* Details Section */}
                 <div className={styles.cardBody}>
                   <div>
-                    <Link to={`/products/${product.name}`} className={styles.productName}>
+                    {/* Name Link - CHANGED: Links to details page */}
+                    <Link to={`/product/${product.id}/details`} className={styles.productName}>
                       {product.name}
                     </Link>
                     <p className={styles.productDesc}>
                       {product.description}
                     </p>
-                    <div className={styles.stockStatus}>
+                    <div className={styles.stockWrapper}>
                         <StockStatus inventory={product.inventory} />
                     </div>
                   </div>
 
                   {/* Footer (Price & Action) */}
                   <div className={styles.cardFooter}>
-                    <span className={styles.price}>${product.price}</span>
+                    <span className={styles.price}>${product.price?.toFixed(2)}</span>
+                    {/* Buy Button - CHANGED: Links to details page */}
                     <Link
-                      to={`/products/${product.name}`}
+                      to={`/product/${product.id}/details`}
                       className={styles.shopBtn}
                     >
-                      View Details
+                      Buy Now
                     </Link>
                   </div>
                 </div>
@@ -121,7 +150,9 @@ const Home = () => {
         )}
       </div>
 
-      <Paginator />
+      <div className={styles.paginationWrapper}>
+         <Paginator />
+      </div>
     </>
   );
 };

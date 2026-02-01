@@ -1,79 +1,80 @@
-/* Products.module.css */
-
 .pageContainer {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 30px 20px;
+  font-family: 'Inter', sans-serif;
   color: #333;
+  background-color: #fcfcfc;
 }
 
-/* Search Bar Section */
 .searchSection {
   display: flex;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .searchWrapper {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
 }
 
-/* Main Layout: Sidebar + Grid */
 .layoutGrid {
   display: grid;
-  grid-template-columns: 260px 1fr; /* Fixed sidebar width, remaining for products */
-  gap: 40px;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
   align-items: start;
-  position: relative;
 }
 
-/* Sidebar Styling */
 .sidebarWrapper {
-  position: sticky;
-  top: 100px; /* Adjust based on navbar height */
-  background-color: #fff;
-  border-radius: 12px;
-  border: 1px solid #f0f0f0;
+  background: white;
   padding: 20px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  border-radius: 8px;
+  border: 1px solid #eee;
+  position: sticky;
+  top: 90px;
 }
 
-/* Scrollbar for sidebar */
-.sidebarWrapper::-webkit-scrollbar {
-  width: 4px;
-}
-.sidebarWrapper::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 4px;
-}
-
-/* Product Section */
 .productSection {
   width: 100%;
-  min-height: 500px; /* Prevent collapse if empty */
 }
 
-/* Responsive Design */
+.resultsCount {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.paginationWrapper {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+.resetBtn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 @media (max-width: 992px) {
   .layoutGrid {
-    grid-template-columns: 1fr; /* Stack layout on smaller screens */
+    grid-template-columns: 1fr;
   }
-
   .sidebarWrapper {
     position: static;
-    margin-bottom: 30px;
-    max-height: none;
-    box-shadow: none;
-    border: 1px solid #eee;
-  }
-}
-
-@media (max-width: 600px) {
-  .pageContainer {
-    padding: 20px 10px;
+    margin-bottom: 20px;
   }
 }
