@@ -8,7 +8,8 @@ import Hero from "../hero/Hero";
 import Paginator from "../common/Paginator";
 import ProductImage from "../utils/ProductImage";
 import LoadSpinner from "../common/LoadSpinner";
-import StockStatus from "../utils/StockStatus";
+// Removed StockStatus import as we are implementing custom logic inline
+// import StockStatus from "../utils/StockStatus";
 
 // State Actions
 import { setTotalItems } from "../../store/features/paginationSlice";
@@ -104,7 +105,7 @@ const Home = () => {
             {currentProducts.map((product) => (
               <div key={product.id} className={styles.card}>
                 
-                {/* Image Section - CHANGED: Links to details page */}
+                {/* Image Section */}
                 <Link to={`/product/${product.id}/details`} className={styles.imageWrapper}>
                   {product.images.length > 0 ? (
                     <ProductImage productId={product.images[0].id} />
@@ -120,22 +121,31 @@ const Home = () => {
                 {/* Details Section */}
                 <div className={styles.cardBody}>
                   <div>
-                    {/* Name Link - CHANGED: Links to details page */}
+                    {/* Name Link */}
                     <Link to={`/product/${product.id}/details`} className={styles.productName}>
                       {product.name}
                     </Link>
                     <p className={styles.productDesc}>
                       {product.description}
                     </p>
+                    
+                    {/* Stock Status - FIXED: Shows text only (In Stock / Out of Stock) */}
                     <div className={styles.stockWrapper}>
-                        <StockStatus inventory={product.inventory} />
+                        {product.inventory > 0 ? (
+                          <span style={{ color: "#28a745", fontWeight: "600", fontSize: "0.85rem" }}>
+                            In Stock
+                          </span>
+                        ) : (
+                          <span style={{ color: "#dc3545", fontWeight: "600", fontSize: "0.85rem" }}>
+                            Out of Stock
+                          </span>
+                        )}
                     </div>
                   </div>
 
                   {/* Footer (Price & Action) */}
                   <div className={styles.cardFooter}>
                     <span className={styles.price}>${product.price?.toFixed(2)}</span>
-                    {/* Buy Button - CHANGED: Links to details page */}
                     <Link
                       to={`/product/${product.id}/details`}
                       className={styles.shopBtn}

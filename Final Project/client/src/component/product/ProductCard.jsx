@@ -7,7 +7,8 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 // Actions & Utils
 import { deleteProduct } from "../../store/features/productSlice";
 import ProductImage from "../utils/ProductImage";
-import StockStatus from "../utils/StockStatus";
+// Removed StockStatus import to implement custom logic here
+// import StockStatus from "../utils/StockStatus";
 
 // Styles
 import styles from "./ProductCard.module.css";
@@ -62,8 +63,17 @@ const ProductCard = ({ products }) => {
               ${product.price}
             </div>
 
+            {/* Stock Status - FIXED: Shows text only, no numbers */}
             <div className={styles.stockWrapper}>
-              <StockStatus inventory={product.inventory} />
+              {product.inventory > 0 ? (
+                <span style={{ color: "#28a745", fontWeight: "600", fontSize: "0.85rem" }}>
+                  In Stock
+                </span>
+              ) : (
+                <span style={{ color: "#dc3545", fontWeight: "600", fontSize: "0.85rem" }}>
+                  Out of Stock
+                </span>
+              )}
             </div>
 
             {/* Actions */}
