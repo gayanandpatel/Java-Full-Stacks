@@ -38,7 +38,7 @@ export const updateProduct = createAsyncThunk(
         `/products/product/${productId}/update`,
         updatedProduct
       );
-      return response.data; // Fixed: Return serializable data, not full axios object
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -73,7 +73,7 @@ export const getAllBrands = createAsyncThunk(
   }
 );
 
-// Fetch Distinct Product Names (For Search/Suggestions)
+// Fetch Distinct Product Names (For Search)
 export const getDistinctProductsByName = createAsyncThunk(
   "product/getDistinctProductsByName",
   async (_, { rejectWithValue }) => {
@@ -86,7 +86,7 @@ export const getDistinctProductsByName = createAsyncThunk(
   }
 );
 
-// Get Single Product by ID
+// Get Single Product by ID (CRITICAL FIX HERE)
 export const getProductById = createAsyncThunk(
   "product/getProductById",
   async (productId, { rejectWithValue }) => {
@@ -116,12 +116,12 @@ export const getProductsByCategory = createAsyncThunk(
 
 const initialState = {
   products: [],
-  product: null, // Selected product for details/edit
+  product: null,
   distinctProducts: [],
   brands: [],
   selectedBrands: [],
-  quantity: 1, // UI state for product detail counter
-  isLoading: false,
+  quantity: 1,
+  isLoading: false, // Ensure this defaults to false
   error: null,
   successMessage: null,
 };
@@ -130,7 +130,6 @@ const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-    // Brand Filtering Logic
     filterByBrands: (state, action) => {
       const { brand, isChecked } = action.payload;
       if (isChecked) {
@@ -139,15 +138,12 @@ const productSlice = createSlice({
         state.selectedBrands = state.selectedBrands.filter((b) => b !== brand);
       }
     },
-    // Product Detail Quantity Counter
     setQuantity: (state, action) => {
       state.quantity = action.payload;
     },
-    // Manually Add Brand (Optimistic)
     addBrand: (state, action) => {
       state.brands.push(action.payload);
     },
-    // Clear Messages
     clearProductError: (state) => {
       state.error = null;
     },
@@ -168,6 +164,20 @@ const productSlice = createSlice({
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // --- Get Product By ID (Fixed Handlers) ---
+      .addCase(getProductById.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getProductById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.product = action.payload;
+      })
+      .addCase(getProductById.rejected, (state, action) => {
+        state.isLoading = false; // Stops the spinner on error
         state.error = action.payload;
       })
 
@@ -193,14 +203,10 @@ const productSlice = createSlice({
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.product = action.payload.data; // Update the single view
-        
-        // Update list view if necessary
+        state.product = action.payload.data;
+        // Update list view if item exists there
         const index = state.products.findIndex(p => p.id === action.payload.data.id);
-        if (index !== -1) {
-          state.products[index] = action.payload.data;
-        }
-        
+        if (index !== -1) state.products[index] = action.payload.data;
         state.successMessage = "Product updated successfully";
       })
       .addCase(updateProduct.rejected, (state, action) => {
@@ -215,53 +221,25 @@ const productSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Optimistically remove from list
         state.products = state.products.filter(
           (product) => product.id !== action.payload.id
         );
-        state.successMessage = action.payload.message || "Product deleted";
+        state.successMessage = action.payload.message;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
 
-      // --- Get Brands ---
-      .addCase(getAllBrands.pending, (state) => {
-        state.isLoading = true;
-      })
+      // --- Other Fetchers ---
       .addCase(getAllBrands.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.brands = action.payload;
       })
-      .addCase(getAllBrands.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-
-      // --- Get Distinct Names ---
       .addCase(getDistinctProductsByName.fulfilled, (state, action) => {
         state.distinctProducts = action.payload;
       })
-
-      // --- Get By ID ---
-      .addCase(getProductById.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(getProductById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.product = action.payload;
-      })
-      .addCase(getProductById.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-
-      // --- Get By Category ---
       .addCase(getProductsByCategory.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(getProductsByCategory.fulfilled, (state, action) => {
         state.isLoading = false;

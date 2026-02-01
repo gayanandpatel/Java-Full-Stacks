@@ -1,15 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api, privateApi } from "../../component/services/api";
 
-// --- Async Thunks ---
-
-// Add Item to Cart
-// Changed from FormData to Query Params to prevent 500 Internal Server Errors
+// Fix: Use Query Params instead of FormData for simple fields
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ productId, quantity }, { rejectWithValue }) => {
     try {
-      // Sending as query params (common for Spring Boot: ?productId=1&quantity=1)
       const response = await privateApi.post("/cartItems/item/add", null, {
         params: { productId, quantity },
       });
@@ -20,7 +16,6 @@ export const addToCart = createAsyncThunk(
   }
 );
 
-// Get User Cart
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
   async (userId, { rejectWithValue }) => {
@@ -33,15 +28,14 @@ export const getUserCart = createAsyncThunk(
   }
 );
 
-// Update Item Quantity
 export const updateQuantity = createAsyncThunk(
   "cart/updateQuantity",
   async ({ cartId, itemId, newQuantity }, { rejectWithValue }) => {
     try {
-      const response = await api.put(
-        `/cartItems/cart/${cartId}/item/${itemId}/update`,
-        null, // No body
-        { params: { quantity: newQuantity } } // Send quantity as param
+      await api.put(
+        `/cartItems/cart/${cartId}/item/${itemId}/update`, 
+        null, 
+        { params: { quantity: newQuantity } }
       );
       return { itemId, newQuantity };
     } catch (error) {
@@ -50,7 +44,6 @@ export const updateQuantity = createAsyncThunk(
   }
 );
 
-// Remove Item from Cart
 export const removeItemFromCart = createAsyncThunk(
   "cart/removeItemFromCart",
   async ({ cartId, itemId }, { rejectWithValue }) => {
@@ -63,21 +56,11 @@ export const removeItemFromCart = createAsyncThunk(
   }
 );
 
-// --- Helper to Recalculate Totals ---
-const recalculateCart = (state) => {
-  state.totalAmount = state.items.reduce(
-    (total, item) => total + item.totalPrice,
-    0
-  );
-};
-
-// --- Slice ---
-
 const initialState = {
   items: [],
   cartId: null,
   totalAmount: 0,
-  isLoading: false, // General loading state
+  isLoading: false,
   error: null,
   successMessage: null,
 };
@@ -92,84 +75,67 @@ const cartSlice = createSlice({
       state.cartId = null;
     },
     clearCartMessages: (state) => {
-      state.successMessage = null;
       state.error = null;
-    },
+      state.successMessage = null;
+    }
   },
   extraReducers: (builder) => {
     builder
-      // --- Add to Cart ---
-      .addCase(addToCart.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
+      // Add to Cart
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Depending on backend response, you might need to push to items or re-fetch
-        // For now, assuming backend returns success message only, we might trigger a refetch in UI
+        // Optimistic update: You might want to refetch the cart or just push if backend returns item
+        // Assuming backend returns success message:
         state.successMessage = "Item added to cart successfully";
       })
       .addCase(addToCart.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || "Failed to add item to cart";
+        state.error = action.payload;
       })
 
-      // --- Get User Cart ---
+      // Get User Cart
       .addCase(getUserCart.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(getUserCart.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.items = action.payload.items;
         state.cartId = action.payload.cartId;
         state.totalAmount = action.payload.totalAmount;
+        state.isLoading = false;
       })
       .addCase(getUserCart.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to load cart";
+        state.error = action.payload;
       })
 
-      // --- Update Quantity ---
-      .addCase(updateQuantity.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
+      // Update Quantity
       .addCase(updateQuantity.fulfilled, (state, action) => {
-        state.isLoading = false;
         const { itemId, newQuantity } = action.payload;
         const item = state.items.find((item) => item.product.id === itemId);
         if (item) {
           item.quantity = newQuantity;
           item.totalPrice = item.product.price * newQuantity;
         }
-        recalculateCart(state);
+        // Recalculate Total
+        state.totalAmount = state.items.reduce(
+          (total, item) => total + item.totalPrice,
+          0
+        );
       })
       .addCase(updateQuantity.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || "Failed to update quantity";
+        state.error = action.payload;
       })
 
-      // --- Remove Item ---
-      .addCase(removeItemFromCart.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
+      // Remove Item
       .addCase(removeItemFromCart.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.items = state.items.filter(
-          (item) => item.product.id !== action.payload
+        const itemId = action.payload;
+        state.items = state.items.filter((item) => item.product.id !== itemId);
+        state.totalAmount = state.items.reduce(
+          (total, item) => total + item.totalPrice,
+          0
         );
-        recalculateCart(state);
-        state.successMessage = "Item removed from cart";
-      })
-      .addCase(removeItemFromCart.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || "Failed to remove item";
       });
   },
 });
 
 export const { clearCart, clearCartMessages } = cartSlice.actions;
-
 export default cartSlice.reducer;
