@@ -60,7 +60,7 @@ const ProductCard = ({ products }) => {
             </p>
 
             <div className={styles.price}>
-              ${product.price}
+              ₹{product.price}
             </div>
 
             {/* Stock Status - FIXED: Shows text only, no numbers */}

@@ -145,7 +145,7 @@ const Home = () => {
 
                   {/* Footer (Price & Action) */}
                   <div className={styles.cardFooter}>
-                    <span className={styles.price}>${product.price?.toFixed(2)}</span>
+                    <span className={styles.price}>₹{product.price?.toFixed(2)}</span>
                     <Link
                       to={`/product/${product.id}/details`}
                       className={styles.shopBtn}

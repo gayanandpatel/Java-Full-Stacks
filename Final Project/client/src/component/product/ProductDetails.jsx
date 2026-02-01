@@ -121,7 +121,7 @@ const ProductDetails = () => {
             </div>
 
             <div className={styles.priceSection}>
-              <h2 className={styles.price}>${product.price?.toFixed(2)}</h2>
+              <h2 className={styles.price}>₹{product.price?.toFixed(2)}</h2>
               <span className={styles.taxNote}>Inclusive of all taxes</span>
             </div>
 

@@ -138,7 +138,7 @@ const Checkout = () => {
       const { clientSecret } = await dispatch(
         createPaymentIntent({
           amount: Math.round(cart.totalAmount * 100),
-          currency: "usd",
+          currency: "inr",
         })
       ).unwrap();
 
@@ -368,11 +368,11 @@ const Checkout = () => {
           <h3 className={styles.summaryTitle}>Order Summary</h3>
           <div className={styles.summaryRow}>
             <span>Subtotal</span>
-            <span>${cart.totalAmount?.toFixed(2)}</span>
+            <span>₹{cart.totalAmount?.toFixed(2)}</span>
           </div>
           <div className={styles.summaryRow}>
             <span>Tax (Estimated)</span>
-            <span>$0.00</span>
+            <span>₹0.00</span>
           </div>
           <div className={styles.summaryRow}>
             <span>Shipping</span>
@@ -380,7 +380,7 @@ const Checkout = () => {
           </div>
           <div className={styles.totalRow}>
             <span>Total</span>
-            <span>${cart.totalAmount?.toFixed(2)}</span>
+            <span>₹{cart.totalAmount?.toFixed(2)}</span>
           </div>
 
           <button
@@ -389,7 +389,7 @@ const Checkout = () => {
             disabled={!stripe || loading}
             onClick={handlePaymentAndOrder}
           >
-            {loading ? <ClipLoader size={20} color={"#ffffff"} /> : `Pay $${cart.totalAmount?.toFixed(2)}`}
+            {loading ? <ClipLoader size={20} color={"#ffffff"} /> : `Pay ₹${cart.totalAmount?.toFixed(2)}`}
           </button>
         </div>
       </div>
