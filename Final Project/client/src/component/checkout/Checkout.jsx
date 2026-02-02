@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; // Removed useParams
+import { useNavigate } from "react-router-dom"; 
 import { getUserCart } from "../../store/features/cartSlice";
 import { getUserById } from "../../store/features/userSlice"; 
 import {
@@ -12,35 +12,30 @@ import { toast, ToastContainer } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa"; 
 
-// Styles
+
 import styles from "./Checkout.module.css";
 
-// ISO 3166-1 alpha-2 Country Codes for Stripe
+
 const COUNTRY_OPTIONS = [
   { code: "IN", name: "India" },
   { code: "US", name: "United States" },
   { code: "GB", name: "United Kingdom" },
   { code: "CA", name: "Canada" },
   { code: "AU", name: "Australia" },
-  // ... (rest of your countries can stay here)
 ];
 
 const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // FIX: Get userId from Redux Auth State (Source of Truth)
   const { userId } = useSelector((state) => state.auth);
 
-  // Redux State
   const cart = useSelector((state) => state.cart);
   const user = useSelector((state) => state.user.user); 
 
-  // Stripe Hooks
   const stripe = useStripe();
   const elements = useElements();
 
-  // Local State
   const [cardError, setCardError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null); 
@@ -61,14 +56,12 @@ const Checkout = () => {
 
   // Load Cart AND User Data
   useEffect(() => {
-    // FIX: Ensure we have a userId before fetching
     if (userId) {
       dispatch(getUserCart(userId));
       dispatch(getUserById(userId)); 
     }
   }, [dispatch, userId]);
 
-  // Auto-fill user info
   useEffect(() => {
     if (user) {
       setUserInfo({
@@ -79,7 +72,6 @@ const Checkout = () => {
     }
   }, [user]);
 
-  // Handlers
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserInfo({ ...userInfo, [name]: value });
@@ -127,7 +119,6 @@ const Checkout = () => {
     const cardElement = elements.getElement(CardElement);
 
     try {
-      // FIX: Send raw amount (backend handles *100 conversion)
       const { clientSecret } = await dispatch(
         createPaymentIntent({
           amount: Math.round(cart.totalAmount), 
@@ -166,7 +157,6 @@ const Checkout = () => {
         await dispatch(placeOrder({ userId })).unwrap();
         toast.success("Order placed successfully!");
         setTimeout(() => {
-          // Use navigate instead of window.location for smoother transition
           navigate(`/user-profile/${userId}/profile`);
         }, 2000);
       }
@@ -187,7 +177,7 @@ const Checkout = () => {
         <div className={styles.formSection}>
           <form onSubmit={handlePaymentAndOrder}>
             
-            {/* 1. Customer Information */}
+            {/* Customer Information */}
             <div className={styles.sectionHeader}>
               <span>1</span> Customer Information
             </div>
@@ -212,7 +202,7 @@ const Checkout = () => {
               <input type="email" name="email" className={styles.input} value={userInfo.email} onChange={handleInputChange} required />
             </div>
 
-            {/* 2. Billing Address */}
+            {/* Billing Address */}
             <div className={styles.sectionHeader} style={{marginTop: '30px'}}>
               <span>2</span> Billing / Shipping Address
             </div>
@@ -277,7 +267,7 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* 3. Payment Details */}
+            {/* Payment Details */}
             <div className={styles.sectionHeader} style={{marginTop: '30px'}}>
               <span>3</span> Payment Details
             </div>
