@@ -5,7 +5,10 @@ import { toast, ToastContainer } from "react-toastify";
 import { nanoid } from "nanoid";
 
 // Icons
-import { FaTrash, FaEdit, FaPlus, FaMapMarkerAlt } from "react-icons/fa";
+import { 
+  FaTrash, FaEdit, FaPlus, FaMapMarkerAlt, 
+  FaSortAmountDown, FaSortAmountUp, FaBoxOpen, FaShoppingBag 
+} from "react-icons/fa";
 
 // Actions
 import { fetchUserOrders } from "../../store/features/orderSlice";
@@ -20,6 +23,7 @@ import {
 // Components
 import AddressForm from "../common/AddressForm";
 import LoadSpinner from "../common/LoadSpinner";
+import ProductImage from "../utils/ProductImage"; // Added for better UX
 import placeholder from "../../assets/images/placeholder.png";
 
 // Import Styles
@@ -38,6 +42,7 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [sortOrder, setSortOrder] = useState("desc"); // 'desc' = Newest first
 
   const [newAddress, setNewAddress] = useState({
     addressType: "",
@@ -46,6 +51,14 @@ const UserProfile = () => {
     state: "",
     country: "",
     mobileNumber: "",
+  });
+
+  // --- Sorting Logic ---
+  const sortedOrders = [...(orders || [])].sort((a, b) => {
+    if (!a || !b) return 0;
+    const dateA = new Date(a.orderDate);
+    const dateB = new Date(b.orderDate);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
   });
 
   // --- Address Handlers ---
@@ -62,7 +75,6 @@ const UserProfile = () => {
     setIsEditing(true);
     setEditingAddressId(address.id);
     setShowForm(true);
-    // Scroll to form for better UX
     window.scrollTo({ top: 300, behavior: 'smooth' });
   };
 
@@ -81,7 +93,7 @@ const UserProfile = () => {
       resetForm();
     } catch (error) {
       console.error(error);
-      dispatch(setUserAddresses(user.addressList)); // Revert on error
+      dispatch(setUserAddresses(user.addressList));
     }
   };
 
@@ -153,6 +165,12 @@ const UserProfile = () => {
     dispatch(fetchUserOrders(userId));
   }, [dispatch, userId]);
 
+  // Helper for Status Colors
+  const getStatusClass = (status) => {
+    const key = status ? status.toUpperCase() : "PENDING";
+    return styles[`status_${key}`] || styles.status_PENDING;
+  };
+
   if (loading) return <LoadSpinner />;
 
   return (
@@ -187,7 +205,7 @@ const UserProfile = () => {
           <main className={styles.mainContent}>
             
             {/* 1. Address Section */}
-            <section>
+            <section className={styles.contentSection}>
               <div className={styles.sectionHeader}>
                 <h4 className={styles.sectionTitle}>My Addresses</h4>
                 <button 
@@ -257,40 +275,53 @@ const UserProfile = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-muted">No addresses found. Please add one.</p>
+                  <p className="text-muted">No addresses saved yet.</p>
                 )}
               </div>
             </section>
 
             {/* 2. Order History Section */}
-            <section>
+            <section className={styles.contentSection}>
               <div className={styles.sectionHeader}>
-                <h4 className={styles.sectionTitle}>Recent Orders</h4>
-                <Link to="/products" style={{fontSize: '0.9rem', color: '#c38212', textDecoration: 'none'}}>
-                  Start Shopping
-                </Link>
+                <h4 className={styles.sectionTitle}>Order History</h4>
+                
+                {/* Sorting Controls */}
+                {orders && orders.length > 0 && (
+                  <div className={styles.sortControls}>
+                    <button 
+                      className={`${styles.sortBtn} ${sortOrder === 'desc' ? styles.activeSort : ''}`}
+                      onClick={() => setSortOrder('desc')}
+                    >
+                      Newest <FaSortAmountDown />
+                    </button>
+                    <button 
+                      className={`${styles.sortBtn} ${sortOrder === 'asc' ? styles.activeSort : ''}`}
+                      onClick={() => setSortOrder('asc')}
+                    >
+                      Oldest <FaSortAmountUp />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className={styles.ordersList}>
-                {Array.isArray(orders) && orders.length > 0 ? (
-                  orders.map((order, index) => {
-                    // FIX: Safety check to skip null/undefined orders
+                {sortedOrders && sortedOrders.length > 0 ? (
+                  sortedOrders.map((order, index) => {
+                    // Safety check for bad data
                     if (!order) return null;
 
                     return (
                       <div key={order.id || index} className={styles.orderCard}>
                         
-                        {/* Order Summary Header */}
+                        {/* Order Header Summary */}
                         <div className={styles.orderHeader}>
                           <div className={styles.orderMeta}>
                             <div className={styles.metaGroup}>
-                              <span className={styles.metaLabel}>Order ID</span>
-                              <span className={styles.metaValue}>#{order.id}</span>
-                            </div>
-                            <div className={styles.metaGroup}>
-                              <span className={styles.metaLabel}>Date</span>
+                              <span className={styles.metaLabel}>Order Placed</span>
                               <span className={styles.metaValue}>
-                                {new Date(order.orderDate).toLocaleDateString()}
+                                {new Date(order.orderDate).toLocaleDateString("en-US", {
+                                  year: 'numeric', month: 'short', day: 'numeric'
+                                })}
                               </span>
                             </div>
                             <div className={styles.metaGroup}>
@@ -299,45 +330,60 @@ const UserProfile = () => {
                                 ₹{order.totalAmount?.toFixed(2)}
                               </span>
                             </div>
+                            <div className={styles.metaGroup}>
+                              <span className={styles.metaLabel}>Order ID</span>
+                              <span className={styles.orderId}>#{order.id}</span>
+                            </div>
                           </div>
                           
-                          <span className={styles.statusBadge}>
-                            {order.orderStatus || "Processing"}
-                          </span>
+                          <div className={styles.orderStatusWrapper}>
+                             <span className={`${styles.statusBadge} ${getStatusClass(order.orderStatus)}`}>
+                               {order.orderStatus || "Processing"}
+                             </span>
+                          </div>
                         </div>
 
-                        {/* Order Items Table */}
-                        <div className={styles.orderTableWrapper}>
-                          <table className={styles.orderTable}>
-                            <thead>
-                              <tr>
-                                <th>Product</th>
-                                <th>Brand</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th style={{textAlign: 'right'}}>Subtotal</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {Array.isArray(order.items) && order.items.map((item, i) => (
-                                <tr key={i}>
-                                  <td>{item.productName}</td>
-                                  <td>{item.productBrand}</td>
-                                  <td>{item.quantity}</td>
-                                  <td>₹{item.price?.toFixed(2)}</td>
-                                  <td style={{textAlign: 'right', fontWeight: '600'}}>
-                                    ₹{(item.quantity * item.price).toFixed(2)}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                        {/* Order Items List */}
+                        <div className={styles.itemsContainer}>
+                          {Array.isArray(order.items) && order.items.map((item, i) => (
+                            <div key={i} className={styles.itemRow}>
+                              
+                              {/* Image */}
+                              <div className={styles.itemImage}>
+                                <ProductImage productId={item.productId} />
+                              </div>
+
+                              {/* Details */}
+                              <div className={styles.itemDetails}>
+                                <Link to={`/products/${item.productId}`} className={styles.productLink}>
+                                  {item.productName}
+                                </Link>
+                                <div className={styles.itemSubDetail}>
+                                  <span>{item.productBrand}</span>
+                                  <span className={styles.separator}>|</span>
+                                  <span>Qty: {item.quantity}</span>
+                                </div>
+                              </div>
+
+                              {/* Price */}
+                              <div className={styles.itemPrice}>
+                                ₹{item.price?.toFixed(2)}
+                              </div>
+                            </div>
+                          ))}
                         </div>
+
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-muted">No orders found.</p>
+                  <div className={styles.emptyOrders}>
+                    <FaBoxOpen className={styles.emptyIcon} />
+                    <p>No orders found yet.</p>
+                    <Link to="/products" className={styles.shopBtn}>
+                      Start Shopping <FaShoppingBag style={{marginLeft: '8px'}}/>
+                    </Link>
+                  </div>
                 )}
               </div>
             </section>
