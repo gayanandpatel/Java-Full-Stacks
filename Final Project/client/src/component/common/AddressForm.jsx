@@ -23,7 +23,7 @@ const COUNTRY_OPTIONS = [
 ];
 
 const AddressForm = ({
-  address = {}, // Default to empty object
+  address = {},
   onChange,
   onSubmit,
   isEditing = false,

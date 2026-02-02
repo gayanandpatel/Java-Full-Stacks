@@ -1,10 +1,9 @@
-/* Login.module.css */
 .loginContainer {
-  min-height: 80vh; /* Takes up most of the screen */
+  min-height: 80vh; 
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa; /* Light background for contrast against the dark card, or use a dark bg image */
+  background-color: #f8f9fa;
   padding: 40px 20px;
 }
 
@@ -62,7 +61,7 @@
 
 .input {
   width: 100%;
-  padding: 12px 15px 12px 45px; /* Left padding creates space for the icon */
+  padding: 12px 15px 12px 45px;
   border: 2px solid #eee;
   border-radius: 8px;
   font-size: 1rem;
@@ -77,7 +76,7 @@
   box-shadow: 0 0 0 3px rgba(195, 130, 18, 0.1);
 }
 
-.input:focus + .icon, /* If icon was after input */
+.input:focus + .icon, 
 .inputWrapper:focus-within .icon {
   color: var(--search-button-color, #c38212);
 }
@@ -142,7 +141,7 @@
 @media (max-width: 576px) {
   .loginCard {
     padding: 30px 20px;
-    box-shadow: none; /* Flatter on mobile */
+    box-shadow: none;
     background: transparent;
   }
   .loginContainer {
