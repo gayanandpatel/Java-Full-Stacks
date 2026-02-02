@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,10 +11,10 @@ import QuantityUpdater from "../utils/QuantityUpdater";
 import LoadSpinner from "../common/LoadSpinner";
 import { toast, ToastContainer } from "react-toastify";
 
-// Import Icons
+
 import { FaTrash } from "react-icons/fa"; 
 
-// Import CSS Module
+
 import styles from "./Cart.module.css";
 
 const Cart = () => {
@@ -26,7 +26,6 @@ const Cart = () => {
   const isLoading = useSelector((state) => state.cart.isLoading);
 
   useEffect(() => {
-    // This will now work automatically because we are selecting userId from state above
     if (userId) {
       dispatch(getUserCart(userId));
     }
@@ -91,16 +90,16 @@ const Cart = () => {
           <h2 className={styles.heading}>Shopping Cart ({cart.items.length} items)</h2>
           
           <div className={styles.layout}>
-            {/* Left Column: Cart Items */}
+            
             <div className={styles.cartList}>
-              {/* Desktop Header */}
+              
               <div className={`d-none d-md-grid ${styles.headerRow}`}>
                 <div>Product</div>
                 <div>Description</div>
                 <div>Brand</div>
                 <div>Quantity</div>
                 <div>Total</div>
-                <div></div> {/* Action Column Header */}
+                <div></div>
               </div>
 
               {cart.items.map((item, index) => (
