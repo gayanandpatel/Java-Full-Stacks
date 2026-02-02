@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children, allowedRoles = [], useOutlet = false }) => {
   //Default roles to empty array to prevent crashes if undefined
   const { isAuthenticated, roles = [] } = useSelector((state) => state.auth);
 
-  // 3. Check Authentication first
+  // Check Authentication first
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
