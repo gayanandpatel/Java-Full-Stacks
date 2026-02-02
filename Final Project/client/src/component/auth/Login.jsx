@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom"; // Added useSearchParams
+import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, clearError } from "../../store/features/authSlice";
 import { BsPersonFill, BsLockFill } from "react-icons/bs";
@@ -15,12 +15,10 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  
-  // Hook to read URL query parameters
   const [searchParams] = useSearchParams();
   
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const authErrorMessage = useSelector((state) => state.auth.error); // Check if your slice uses 'error' or 'errorMessage'
+  const authErrorMessage = useSelector((state) => state.auth.error);
   
   const from = location.state?.from?.pathname || "/";
 
@@ -28,24 +26,32 @@ const Login = () => {
   useEffect(() => {
     const message = searchParams.get("message");
     if (message === "session_expired") {
-      toast.error("Your session has expired. Please login again.");
-      // Clean URL so the message doesn't persist on refresh
+      toast.info("You Logged Out Successfully. Please login again.");
       window.history.replaceState({}, document.title, "/login");
     }
   }, [searchParams]);
 
-  // 2. Handle Authentication Success
+  // 2. Handle Authentication Success (FIXED)
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(from, { replace: true });
+      // 1. Show the Welcome Message
+      toast.success("Login Successful! Welcome back.");
+
+      // 2. Add a small delay before navigating so the user sees the toast
+      const timer = setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 1000); // 1 second delay
+
+      // Cleanup timer if component unmounts
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, navigate, from]);
 
-  // 3. Handle Auth Errors from Redux
+  // 3. Handle Auth Errors
   useEffect(() => {
     if (authErrorMessage) {
       toast.error(authErrorMessage);
-      dispatch(clearError()); // Clear error after showing toast
+      dispatch(clearError());
     }
   }, [authErrorMessage, dispatch]);
 
@@ -63,7 +69,6 @@ const Login = () => {
       toast.error("Please enter both email and password");
       return;
     }
-    
     dispatch(login(credentials));
   };
 
