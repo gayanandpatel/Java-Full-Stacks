@@ -56,9 +56,25 @@ const UserProfile = () => {
   // --- Sorting Logic ---
   const sortedOrders = [...(orders || [])].sort((a, b) => {
     if (!a || !b) return 0;
+    
     const dateA = new Date(a.orderDate);
     const dateB = new Date(b.orderDate);
-    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    
+    // 1. Calculate the difference in time
+    const diff = dateA - dateB;
+
+    // 2. If dates are different, return the time difference
+    if (diff !== 0) {
+      return sortOrder === "asc" ? diff : -diff;
+    }
+
+    // 3. TIE-BREAKER: If dates are exactly the same, sort by ID
+    // Assuming higher ID means a newer order
+    // Note: We parse ID to Int just in case they are strings like "10" vs "2"
+    const idA = parseInt(a.id);
+    const idB = parseInt(b.id);
+    
+    return sortOrder === "asc" ? idA - idB : idB - idA;
   });
 
   // --- Address Handlers ---
