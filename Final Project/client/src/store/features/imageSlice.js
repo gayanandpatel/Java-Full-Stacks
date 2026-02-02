@@ -9,6 +9,8 @@ export const uploadImages = createAsyncThunk(
   async ({ productId, files }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
+      
+      // Append files
       if (Array.isArray(files)) {
         files.forEach((file) => {
           formData.append("files", file);
@@ -16,9 +18,22 @@ export const uploadImages = createAsyncThunk(
       } else {
         formData.append("files", files);
       }
-      formData.append("productId", productId);
-
-      const response = await api.post("/images/upload", formData);
+      
+      // CRITICAL FIX: 
+      // 1. Send ID in URL (Standard for most backends).
+      // 2. Pass 'headers' config to override any global 'application/json' defaults.
+      // Setting Content-Type to undefined lets the browser set it automatically 
+      // with the correct 'boundary=...' parameter.
+      const response = await api.post(
+        `/images/upload?productId=${productId}`, 
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -35,7 +50,17 @@ export const updateProductImage = createAsyncThunk(
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await api.put(`/images/image/${imageId}/update`, formData);
+      
+      // Apply the same header fix here
+      const response = await api.put(
+        `/images/image/${imageId}/update`, 
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -63,7 +88,7 @@ export const deleteProductImage = createAsyncThunk(
 // --- Slice ---
 
 const initialState = {
-  uploadedImages: [], // Used to trigger UI updates/refetches in components
+  uploadedImages: [], 
   isLoading: false,
   error: null,
   successMessage: null,
@@ -96,10 +121,11 @@ const imageSlice = createSlice({
       })
       .addCase(uploadImages.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.uploadedImages = [
-          ...state.uploadedImages,
-          ...action.payload.data,
-        ];
+        const newImages = Array.isArray(action.payload.data) 
+          ? action.payload.data 
+          : [action.payload.data];
+          
+        state.uploadedImages = [...state.uploadedImages, ...newImages];
         state.successMessage = "Images uploaded successfully";
       })
       .addCase(uploadImages.rejected, (state, action) => {
@@ -115,8 +141,9 @@ const imageSlice = createSlice({
       })
       .addCase(updateProductImage.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Append updated image to trigger re-render in consuming components
-        state.uploadedImages = [...state.uploadedImages, action.payload.data];
+        state.uploadedImages = state.uploadedImages.map(img => 
+             img.id === action.payload.data.id ? action.payload.data : img
+        );
         state.successMessage = "Image updated successfully";
       })
       .addCase(updateProductImage.rejected, (state, action) => {
@@ -133,6 +160,9 @@ const imageSlice = createSlice({
       .addCase(deleteProductImage.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = action.payload?.message || "Image deleted successfully";
+        // Safe ID access
+        const deletedId = action.meta.arg.imageId;
+        state.uploadedImages = state.uploadedImages.filter(img => img.id !== deletedId);
       })
       .addCase(deleteProductImage.rejected, (state, action) => {
         state.isLoading = false;
