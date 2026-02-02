@@ -355,7 +355,7 @@ const UserProfile = () => {
 
                               {/* Details */}
                               <div className={styles.itemDetails}>
-                                <Link to={`/products/${item.productId}`} className={styles.productLink}>
+                                <Link to={`/product/${item.productId}/details`} className={styles.productLink}>
                                   {item.productName}
                                 </Link>
                                 <div className={styles.itemSubDetail}>
