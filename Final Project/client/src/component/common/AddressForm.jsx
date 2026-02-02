@@ -1,11 +1,7 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { FaCheck, FaTimes } from "react-icons/fa";
-
-// Styles
 import styles from "./AddressForm.module.css";
 
-// Standard ISO 3166-1 alpha-2 Country Codes
-// This matches the list used in your Checkout component for Stripe compatibility.
 const COUNTRY_OPTIONS = [
   { code: "IN", name: "India" },
   { code: "US", name: "United States" },
@@ -27,28 +23,25 @@ const COUNTRY_OPTIONS = [
 ];
 
 const AddressForm = ({
-  address,
+  address = {}, // Default to empty object
   onChange,
   onSubmit,
-  isEditing,
+  isEditing = false,
   onCancel,
   showButtons = true,
   showCheck = true,
   showTitle = true,
   showAddressType = true,
-  // showPostalCode prop wasn't used in original logic, but we include field by default
 }) => {
-
   return (
     <div className={styles.formContainer}>
-      
       {showTitle && (
         <h5 className={styles.title}>
           {isEditing ? "Edit Address" : "Add New Address"}
         </h5>
       )}
 
-      {/* Row 1: Street & City */}
+      {/* Street & City */}
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.formGroup}>
@@ -78,7 +71,7 @@ const AddressForm = ({
         </div>
       </div>
 
-      {/* Row 2: State & Postal Code */}
+      {/* State & Postal Code */}
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.formGroup}>
@@ -108,7 +101,7 @@ const AddressForm = ({
         </div>
       </div>
 
-      {/* Row 3: Country & Phone */}
+      {/* Country & Phone */}
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.formGroup}>
@@ -143,7 +136,7 @@ const AddressForm = ({
         </div>
       </div>
 
-      {/* Row 4: Address Type (Conditional) */}
+      {/* Address Type (Conditional) */}
       {showAddressType && (
         <div className={styles.formGroup}>
           <label className={styles.label}>Address Type</label>
@@ -187,6 +180,27 @@ const AddressForm = ({
       )}
     </div>
   );
+};
+
+// Define Prop Types for Safety
+AddressForm.propTypes = {
+  address: PropTypes.shape({
+    street: PropTypes.string,
+    city: PropTypes.string,
+    state: PropTypes.string,
+    postalCode: PropTypes.string,
+    country: PropTypes.string,
+    mobileNumber: PropTypes.string,
+    addressType: PropTypes.string,
+  }),
+  onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
+  isEditing: PropTypes.bool,
+  onCancel: PropTypes.func,
+  showButtons: PropTypes.bool,
+  showCheck: PropTypes.bool,
+  showTitle: PropTypes.bool,
+  showAddressType: PropTypes.bool,
 };
 
 export default AddressForm;

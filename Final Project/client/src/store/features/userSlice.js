@@ -4,7 +4,6 @@ import axios from "axios";
 
 // --- Async Thunks ---
 
-// Get User Profile
 export const getUserById = createAsyncThunk(
   "user/getUserById",
   async (userId, { rejectWithValue }) => {
@@ -19,7 +18,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Register User
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async ({ user, addresses }, { rejectWithValue }) => {
@@ -41,18 +39,15 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Get Country Names (External API)
 export const getCountryNames = createAsyncThunk(
   "user/getCountryNames",
   async (_, { rejectWithValue }) => {
     try {
-      // Use plain axios to avoid sending app credentials to external API
       const response = await axios.get("https://restcountries.com/v3.1/all");
       const countryNames = response.data.map((country) => ({
         name: country.name.common,
         code: country.cca2,
       }));
-      // Sort alphabetically
       countryNames.sort((a, b) => a.name.localeCompare(b.name));
       return countryNames;
     } catch (error) {
@@ -65,11 +60,14 @@ export const getCountryNames = createAsyncThunk(
 
 export const addAddress = createAsyncThunk(
   "user/addAddress",
-  async ({ address, userId }, { rejectWithValue }) => {
+  async ({ address, userId }, { dispatch, rejectWithValue }) => {
     try {
-      // Note: Backend seems to expect an array based on previous code
       const response = await privateApi.post(`/addresses/${userId}/new`, [address]);
-      return response.data; // Expecting the added address or updated list
+      // CRITICAL FIX: Immediately re-fetch user data to get the REAL DB IDs
+      if (userId) {
+        dispatch(getUserById(userId));
+      }
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to add address");
     }
@@ -78,9 +76,30 @@ export const addAddress = createAsyncThunk(
 
 export const updateAddress = createAsyncThunk(
   "user/updateAddress",
-  async ({ id, address }, { rejectWithValue }) => {
+  async ({ id, userId, address }, { dispatch, rejectWithValue }) => {
     try {
-      const response = await privateApi.put(`/addresses/${id}/update`, address);
+      // 1. Sanitize the ID
+      const addressId = encodeURIComponent(String(id).trim());
+
+      // 2. Sanitize Payload (Prevent 500 Errors)
+      // We strip non-numeric characters from phone numbers to prevent backend crashes
+      const cleanPayload = {
+        street: address.street || "",
+        city: address.city || "",
+        state: address.state || "",
+        postalCode: address.postalCode || "",
+        country: address.country || "",
+        mobileNumber: address.mobileNumber ? String(address.mobileNumber) : "", 
+        addressType: address.addressType || "HOME",
+      };
+
+      const response = await privateApi.put(`/addresses/${addressId}/update`, cleanPayload);
+
+      // CRITICAL FIX: Sync with Database immediately
+      if (userId) {
+        dispatch(getUserById(userId));
+      }
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update address");
@@ -90,12 +109,22 @@ export const updateAddress = createAsyncThunk(
 
 export const deleteAddress = createAsyncThunk(
   "user/deleteAddress",
-  async ({ id }, { rejectWithValue }) => {
+  async ({ id, userId }, { dispatch, rejectWithValue }) => {
     try {
-      const response = await privateApi.delete(`/addresses/${id}/delete`);
+      const addressId = encodeURIComponent(String(id).trim());
+      const response = await privateApi.delete(`/addresses/${addressId}/delete`);
+      
+      // CRITICAL FIX: Sync with Database immediately
+      if (userId) {
+        dispatch(getUserById(userId));
+      }
+
       return { id, message: response.data?.message };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to delete address");
+      const message = 
+        error.response?.data?.message || 
+        "Cannot delete this address (it might be used in an order).";
+      return rejectWithValue(message);
     }
   }
 );
@@ -114,11 +143,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // Manual setters if needed
     setUser(state, action) {
       state.user = action.payload;
     },
-    // Helper to manually update address list in store without refetching
     setUserAddresses(state, action) {
       if (state.user) {
         state.user.addressList = action.payload;
@@ -133,7 +160,7 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // --- Get User ---
+      // Get User
       .addCase(getUserById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -146,28 +173,25 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-
-      // --- Register User ---
+      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload; // Assuming backend returns user object on register
+        state.user = action.payload;
         state.successMessage = "Registration successful!";
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-
-      // --- Get Countries ---
+      // Countries
       .addCase(getCountryNames.fulfilled, (state, action) => {
         state.countryNames = action.payload;
       })
-
-      // --- Add Address ---
+      // Add Address
       .addCase(addAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -175,17 +199,13 @@ const userSlice = createSlice({
       .addCase(addAddress.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = "Address added successfully";
-        // If backend returns the specific added address, push it. 
-        // If backend returns generic success, you might need to refetch or rely on component to update list.
-        // Assuming optimistic update logic is handled via setUserAddresses in component or here:
-        // Ideally, backend returns the new address object.
+        // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(addAddress.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-
-      // --- Update Address ---
+      // Update Address
       .addCase(updateAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -193,13 +213,13 @@ const userSlice = createSlice({
       .addCase(updateAddress.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = "Address updated successfully";
+        // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(updateAddress.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-
-      // --- Delete Address ---
+      // Delete Address
       .addCase(deleteAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -207,12 +227,7 @@ const userSlice = createSlice({
       .addCase(deleteAddress.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = action.payload.message || "Address deleted";
-        // Remove from local state immediately
-        if (state.user && state.user.addressList) {
-          state.user.addressList = state.user.addressList.filter(
-            (addr) => addr.id !== action.payload.id
-          );
-        }
+         // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(deleteAddress.rejected, (state, action) => {
         state.isLoading = false;
