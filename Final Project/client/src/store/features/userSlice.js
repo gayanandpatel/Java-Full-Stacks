@@ -50,7 +50,7 @@ export const getCountryNames = createAsyncThunk(
       }));
       countryNames.sort((a, b) => a.name.localeCompare(b.name));
       return countryNames;
-    } catch (error) {
+    } catch {
       return rejectWithValue("Failed to load country list");
     }
   }
@@ -196,7 +196,7 @@ const userSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(addAddress.fulfilled, (state, action) => {
+      .addCase(addAddress.fulfilled, (state) => {
         state.isLoading = false;
         state.successMessage = "Address added successfully";
         // No manual state update needed here because we dispatch(getUserById)
@@ -210,7 +210,7 @@ const userSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updateAddress.fulfilled, (state, action) => {
+      .addCase(updateAddress.fulfilled, (state) => {
         state.isLoading = false;
         state.successMessage = "Address updated successfully";
         // No manual state update needed here because we dispatch(getUserById)
