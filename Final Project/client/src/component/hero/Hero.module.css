@@ -2,120 +2,107 @@
 .heroContainer {
   position: relative;
   width: 100%;
-  height: 600px; /* Taller, more cinematic height */
+  /* Reduced height for modern e-commerce standard */
+  height: 380px; 
+  margin-top: 10px; /* Slight spacing from navbar */
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #f1f3f6; /* Common e-commerce background gray */
 }
 
 .sliderWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
 }
 
-/* Gradient overlay to ensure text readability over any image */
+/* Subtle gradient only on the bottom or left, not covering the whole image */
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 40%; /* Only cover left side for text readability */
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0));
   z-index: 1;
   pointer-events: none;
 }
 
 .contentWrapper {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 5%; /* Left aligned */
+  transform: translateY(-50%);
   z-index: 2;
-  width: 100%;
-  max-width: 800px;
-  padding: 0 20px;
-  text-align: center;
-}
-
-.glassCard {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 3rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  max-width: 500px;
+  text-align: left; /* Left align text */
   color: #fff;
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.subTitle {
+  font-size: 1.2rem;
   margin-bottom: 1.5rem;
-  line-height: 1.2;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .brandHighlight {
-  color: var(--search-button-color, #c38212);
-}
-
-.searchContainer {
-  margin: 2rem 0;
-}
-
-.buttonGroup {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 1.5rem;
-}
-
-.primaryBtn, .secondaryBtn {
-  padding: 12px 30px;
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+  color: #ffc107; /* Brighter yellow/gold for contrast */
 }
 
 .primaryBtn {
-  background-color: var(--search-button-color, #c38212);
-  color: white;
-  border: none;
+  padding: 12px 35px;
+  border-radius: 4px; /* Square/Rectangular buttons look more "retail" than round */
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .primaryBtn:hover {
-  background-color: #a86e0d;
-  transform: translateY(-2px);
-}
-
-.secondaryBtn {
-  background-color: transparent;
-  color: white;
-  border: 2px solid rgba(255,255,255,0.5);
-}
-
-.secondaryBtn:hover {
-  border-color: #fff;
-  background-color: rgba(255,255,255,0.1);
+  background-color: #f0f0f0;
+  transform: translateY(-1px);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .heroContainer {
-    height: 500px;
+    height: 220px; /* Much smaller on mobile */
   }
-  .glassCard {
-    padding: 2rem 1.5rem;
-    width: 90%;
-    margin: 0 auto;
+  
+  .overlay {
+    width: 100%; /* Full overlay on mobile to ensure text readablity */
+    background: rgba(0,0,0,0.4);
   }
+
+  .contentWrapper {
+    left: 20px;
+    right: 20px;
+    text-align: center; /* Center on mobile */
+  }
+
   .title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+  }
+  
+  .subTitle {
+    font-size: 0.9rem;
+    display: none; /* Hide subtitle on very small screens to save space */
+  }
+  
+  .primaryBtn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
   }
 }
