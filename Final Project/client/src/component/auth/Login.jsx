@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, clearError } from "../../store/features/authSlice";
@@ -22,7 +22,7 @@ const Login = () => {
   
   const from = location.state?.from?.pathname || "/";
 
-  // 1. Handle "Session Expired" Message
+  // Handle "Session Expired" Message
   useEffect(() => {
     const message = searchParams.get("message");
     if (message === "session_expired") {
@@ -31,13 +31,13 @@ const Login = () => {
     }
   }, [searchParams]);
 
-  // 2. Handle Authentication Success (FIXED)
+  // Handle Authentication Success (FIXED)
   useEffect(() => {
     if (isAuthenticated) {
-      // 1. Show the Welcome Message
+      // Show the Welcome Message
       toast.success("Login Successful! Welcome back.");
 
-      // 2. Add a small delay before navigating so the user sees the toast
+      // Add a small delay before navigating so the user sees the toast
       const timer = setTimeout(() => {
         navigate(from, { replace: true });
       }, 1000); // 1 second delay
@@ -47,7 +47,7 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, from]);
 
-  // 3. Handle Auth Errors
+  // Handle Auth Errors
   useEffect(() => {
     if (authErrorMessage) {
       toast.error(authErrorMessage);
@@ -120,7 +120,7 @@ const Login = () => {
         </form>
 
         <div className={styles.registerLink}>
-          Don't have an account?{" "}
+          {"Don't have an account?"}{" "}
           <Link to="/register" className={styles.link}>
             Register here
           </Link>
