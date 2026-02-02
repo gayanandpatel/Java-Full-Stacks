@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { FaSearch, FaTimes, FaCaretDown } from "react-icons/fa";
+
 
 // Actions
 import { getAllCategories } from "../../store/features/categorySlice";
@@ -74,6 +75,8 @@ const SearchBar = () => {
             </option>
           ))}
         </select>
+        
+        <FaCaretDown className={styles.caretIcon} />
       </div>
 
       {/* Search Input */}

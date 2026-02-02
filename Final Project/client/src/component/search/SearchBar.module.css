@@ -24,13 +24,16 @@
 .categoryWrapper {
   position: relative;
   border-right: 1px solid #e0e0e0;
+  display: flex; /* Ensures height matches content */
+  align-items: center;
 }
 
 .select {
   appearance: none;
   background-color: transparent;
   border: none;
-  padding: 12px 15px 12px 25px;
+  /* Updated padding: increased right padding to 35px to make room for icon */
+  padding: 12px 35px 12px 25px; 
   font-size: 0.9rem;
   font-weight: 500;
   color: #555;
@@ -42,6 +45,16 @@
   text-overflow: ellipsis;
   border-radius: 50px 0 0 50px;
   transition: background-color 0.2s;
+  /* Ensure z-index is higher if needed, but usually fine as is */
+}
+.caretIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%); /* Centers vertically */
+  pointer-events: none; /* CRITICAL: Allows clicks to pass through to the select */
+  color: #777;
+  font-size: 0.8rem;
 }
 
 .select:hover {
