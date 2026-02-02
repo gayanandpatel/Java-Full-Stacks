@@ -1,33 +1,42 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({ children, allowedRoles = [], useOutlet = false }) => {
   const location = useLocation();
-  const { isAuthenticated, roles } = useSelector((state) => state.auth);
+  //Default roles to empty array to prevent crashes if undefined
+  const { isAuthenticated, roles = [] } = useSelector((state) => state.auth);
 
+  // 3. Check Authentication first
   if (!isAuthenticated) {
-    // Redirect them to the login page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Normalize roles to lowercase for safe comparison
-  const userRolesLower = roles.map((role) => role.toLowerCase());
-  const allowedRolesLower = allowedRoles.map((role) => role.toLowerCase());
+  // Role Authorization Logic
+  // If allowedRoles is empty, we assume no specific role is needed (optional, depends on your needs)
+  // If allowedRoles has items, we check them.
+  if (allowedRoles.length > 0) {
+    const userRolesLower = roles.map((role) => role.toLowerCase());
+    const allowedRolesLower = allowedRoles.map((role) => role.toLowerCase());
 
-  // Check if user has at least one of the allowed roles
-  const isAuthorized = userRolesLower.some((userRole) =>
-    allowedRolesLower.includes(userRole)
-  );
+    const isAuthorized = userRolesLower.some((userRole) =>
+      allowedRolesLower.includes(userRole)
+    );
 
-  if (isAuthorized) {
-    return useOutlet ? <Outlet /> : children;
-  } else {
-    // User is logged in but doesn't have permission
-    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+    if (!isAuthorized) {
+      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+    }
   }
+
+  // Render children or Outlet
+  return useOutlet ? <Outlet /> : children;
+};
+
+// Define PropTypes to fix the red squiggly lines
+ProtectedRoute.propTypes = {
+  children: PropTypes.node,
+  allowedRoles: PropTypes.arrayOf(PropTypes.string),
+  useOutlet: PropTypes.bool,
 };
 
 export default ProtectedRoute;
