@@ -178,7 +178,6 @@ const UserProfile = () => {
             
             <div className={styles.divider}></div>
             
-            {/* Optional Sidebar Links could go here */}
             <div style={{color: '#888', fontSize: '0.9rem'}}>
               Member since {new Date().getFullYear()}
             </div>
@@ -274,64 +273,69 @@ const UserProfile = () => {
 
               <div className={styles.ordersList}>
                 {Array.isArray(orders) && orders.length > 0 ? (
-                  orders.map((order, index) => (
-                    <div key={index} className={styles.orderCard}>
-                      
-                      {/* Order Summary Header */}
-                      <div className={styles.orderHeader}>
-                        <div className={styles.orderMeta}>
-                          <div className={styles.metaGroup}>
-                            <span className={styles.metaLabel}>Order ID</span>
-                            <span className={styles.metaValue}>#{order.id}</span>
-                          </div>
-                          <div className={styles.metaGroup}>
-                            <span className={styles.metaLabel}>Date</span>
-                            <span className={styles.metaValue}>
-                              {new Date(order.orderDate).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className={styles.metaGroup}>
-                            <span className={styles.metaLabel}>Total</span>
-                            <span className={styles.metaValue}>
-                              ₹{order.totalAmount?.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <span className={styles.statusBadge}>
-                          {order.orderStatus || "Processing"}
-                        </span>
-                      </div>
+                  orders.map((order, index) => {
+                    // FIX: Safety check to skip null/undefined orders
+                    if (!order) return null;
 
-                      {/* Order Items Table */}
-                      <div className={styles.orderTableWrapper}>
-                        <table className={styles.orderTable}>
-                          <thead>
-                            <tr>
-                              <th>Product</th>
-                              <th>Brand</th>
-                              <th>Qty</th>
-                              <th>Price</th>
-                              <th style={{textAlign: 'right'}}>Subtotal</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Array.isArray(order.items) && order.items.map((item, i) => (
-                              <tr key={i}>
-                                <td>{item.productName}</td>
-                                <td>{item.productBrand}</td>
-                                <td>{item.quantity}</td>
-                                <td>₹{item.price?.toFixed(2)}</td>
-                                <td style={{textAlign: 'right', fontWeight: '600'}}>
-                                  ₹{(item.quantity * item.price).toFixed(2)}
-                                </td>
+                    return (
+                      <div key={order.id || index} className={styles.orderCard}>
+                        
+                        {/* Order Summary Header */}
+                        <div className={styles.orderHeader}>
+                          <div className={styles.orderMeta}>
+                            <div className={styles.metaGroup}>
+                              <span className={styles.metaLabel}>Order ID</span>
+                              <span className={styles.metaValue}>#{order.id}</span>
+                            </div>
+                            <div className={styles.metaGroup}>
+                              <span className={styles.metaLabel}>Date</span>
+                              <span className={styles.metaValue}>
+                                {new Date(order.orderDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className={styles.metaGroup}>
+                              <span className={styles.metaLabel}>Total</span>
+                              <span className={styles.metaValue}>
+                                ₹{order.totalAmount?.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <span className={styles.statusBadge}>
+                            {order.orderStatus || "Processing"}
+                          </span>
+                        </div>
+
+                        {/* Order Items Table */}
+                        <div className={styles.orderTableWrapper}>
+                          <table className={styles.orderTable}>
+                            <thead>
+                              <tr>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th style={{textAlign: 'right'}}>Subtotal</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {Array.isArray(order.items) && order.items.map((item, i) => (
+                                <tr key={i}>
+                                  <td>{item.productName}</td>
+                                  <td>{item.productBrand}</td>
+                                  <td>{item.quantity}</td>
+                                  <td>₹{item.price?.toFixed(2)}</td>
+                                  <td style={{textAlign: 'right', fontWeight: '600'}}>
+                                    ₹{(item.quantity * item.price).toFixed(2)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-muted">No orders found.</p>
                 )}

@@ -1,4 +1,3 @@
-
 import {
   Route,
   RouterProvider,
@@ -26,7 +25,6 @@ import Unauthorized from "./component/Unauthorized";
 // Auth
 import ProtectedRoute from "./component/auth/ProtectedRoute";
 
-// Define router outside the component for better performance and stability
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
@@ -56,8 +54,10 @@ const router = createBrowserRouter(
       >
         <Route path="user-profile" element={<UserProfile />} />
         <Route path="user-profile/:userId/profile" element={<UserProfile />} />
-        <Route path="user/:userId/my-cart" element={<Cart />} />
-        <Route path="checkout/:userId/checkout" element={<Checkout />} />
+        
+        {/* FIX: Simplified Routes (No IDs in URL) */}
+        <Route path="cart" element={<Cart />} />
+        <Route path="checkout" element={<Checkout />} />
       </Route>
 
       {/* --- Protected Routes: Admin Only --- */}

@@ -62,7 +62,7 @@ const ProductDetails = () => {
     }
     await handleAddToCart();
     if (userId) {
-      navigate(`/cart/${userId}/my-cart`); 
+      navigate("/cart");
     } else {
       toast.error("User ID missing. Please login again.");
     }

@@ -94,7 +94,7 @@ const NavBar = () => {
           
           {/* Cart Icon */}
           {userId && (
-            <Link to={`/user/${userId}/my-cart`} className={styles.cartContainer}>
+            <Link to="/cart"  className={styles.cartContainer}>
               <FaShoppingCart />
               {cart.items.length > 0 && (
                 <span className={styles.cartBadge}>{cart.items.length}</span>

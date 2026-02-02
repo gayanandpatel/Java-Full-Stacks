@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getUserCart,
@@ -18,15 +18,18 @@ import { FaTrash } from "react-icons/fa";
 import styles from "./Cart.module.css";
 
 const Cart = () => {
-  const { userId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { userId } = useSelector((state) => state.auth);
   const cart = useSelector((state) => state.cart);
   const cartId = useSelector((state) => state.cart.cartId);
   const isLoading = useSelector((state) => state.cart.isLoading);
 
   useEffect(() => {
-    dispatch(getUserCart(userId));
+    // This will now work automatically because we are selecting userId from state above
+    if (userId) {
+      dispatch(getUserCart(userId));
+    }
   }, [dispatch, userId]);
 
   const handleIncreaseQuantity = (itemId) => {
@@ -65,7 +68,7 @@ const Cart = () => {
   };
 
   const handlePlaceOrder = async () => {
-    navigate(`/checkout/${userId}/checkout`);
+    navigate("/checkout");
   };
 
   if (isLoading) {

@@ -9,6 +9,7 @@ export const placeOrder = createAsyncThunk(
   async ({ userId }, { rejectWithValue }) => {
     try {
       const response = await privateApi.post(`/orders/user/${userId}/place-order`);
+      // The backend returns { message: "...", data: { ...order... } }
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -55,7 +56,7 @@ export const createPaymentIntent = createAsyncThunk(
 
 const initialState = {
   orders: [],
-  currentOrder: null, // Useful if you need to show details of the just-placed order
+  currentOrder: null,
   isLoading: false,
   error: null,
   successMessage: null,
@@ -87,8 +88,15 @@ const orderSlice = createSlice({
       })
       .addCase(placeOrder.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders.push(action.payload.order);
-        state.currentOrder = action.payload.order;
+        
+        // FIX: Read from '.data', not '.order' (Based on ApiResponse.java)
+        const newOrder = action.payload.data;
+        
+        // Only push valid objects to prevent 'undefined' errors
+        if (newOrder) {
+          state.orders.push(newOrder);
+          state.currentOrder = newOrder;
+        }
         state.successMessage = action.payload.message;
       })
       .addCase(placeOrder.rejected, (state, action) => {
@@ -117,8 +125,6 @@ const orderSlice = createSlice({
       })
       .addCase(createPaymentIntent.fulfilled, (state) => {
         state.isLoading = false;
-        // Note: Payment intent secret is usually returned to the component, 
-        // but we track success state here.
       })
       .addCase(createPaymentIntent.rejected, (state, action) => {
         state.isLoading = false;
