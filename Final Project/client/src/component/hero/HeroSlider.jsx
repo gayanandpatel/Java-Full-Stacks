@@ -5,16 +5,17 @@ import "slick-carousel/slick/slick-theme.css";
 import bg1 from "../../assets/images/hero-1.jpg";
 import bg2 from "../../assets/images/hero-2.jpg";
 import bg3 from "../../assets/images/hero-3.jpg";
+import bg4 from "../../assets/images/hero-6.jpg";
 import bg5 from "../../assets/images/hero-7.jpg";
 
-const images = [bg1, bg2, bg3, bg5];
+const images = [bg1, bg2, bg3, bg4, bg5];
 
 const HeroSlider = () => {
   const settings = {
     infinite: true,
     speed: 1000, 
     autoplay: true,
-    autoplaySpeed: 5000, // Fixed naming convention (camelCase)
+    autoplaySpeed: 3000, // Fixed naming convention (camelCase)
     fade: true, // Adds a smoother cross-fade effect
     arrows: false,
     dots: false,
