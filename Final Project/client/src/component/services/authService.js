@@ -4,18 +4,18 @@
  */
 export const logoutUser = () => {
   try {
-    // Clear all auth-related items
+    // Clear all auth-related items from storage
     localStorage.removeItem("authToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("userRoles");
     
-    // Optional: Clear any other app-specific state here
+    // Redirect to login with a specific message query parameter
+    // This allows the Login component to display a toast notification
+    window.location.href = "/login?message=session_expired"; 
     
-    // Force redirect to home/login to reset application state
-    window.location.href = "/login"; 
   } catch (error) {
     console.error("Error during logout:", error);
-    // Fallback redirect even if storage fails
-    window.location.href = "/";
+    // Fallback safety redirect
+    window.location.href = "/login?message=session_expired";
   }
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom"; // Added useSearchParams
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../store/features/authSlice";
+import { login, clearError } from "../../store/features/authSlice";
 import { BsPersonFill, BsLockFill } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import styles from "./Login.module.css";
@@ -16,21 +16,38 @@ const Login = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   
-  const [errorMessage, setErrorMessage] = useState(null);
+  // Hook to read URL query parameters
+  const [searchParams] = useSearchParams();
   
-  // Redux state
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const authErrorMessage = useSelector((state) => state.auth.errorMessage);
+  const authErrorMessage = useSelector((state) => state.auth.error); // Check if your slice uses 'error' or 'errorMessage'
   
-  // Redirect path
   const from = location.state?.from?.pathname || "/";
 
+  // 1. Handle "Session Expired" Message
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message === "session_expired") {
+      toast.error("Your session has expired. Please login again.");
+      // Clean URL so the message doesn't persist on refresh
+      window.history.replaceState({}, document.title, "/login");
+    }
+  }, [searchParams]);
+
+  // 2. Handle Authentication Success
   useEffect(() => {
     if (isAuthenticated) {
       navigate(from, { replace: true });
-      window.location.reload();
     }
   }, [isAuthenticated, navigate, from]);
+
+  // 3. Handle Auth Errors from Redux
+  useEffect(() => {
+    if (authErrorMessage) {
+      toast.error(authErrorMessage);
+      dispatch(clearError()); // Clear error after showing toast
+    }
+  }, [authErrorMessage, dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,25 +55,16 @@ const Login = () => {
       ...prevState,
       [name]: value,
     }));
-    // Clear local error when user types
-    if (errorMessage) setErrorMessage(null);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!credentials.email || !credentials.password) {
-      const msg = "Please enter both email and password";
-      toast.error(msg);
-      setErrorMessage(msg);
+      toast.error("Please enter both email and password");
       return;
     }
     
-    try {
-      await dispatch(login(credentials)).unwrap();
-      // Navigation is handled by the useEffect above upon success
-    } catch (error) {
-      toast.error(authErrorMessage || "Login failed");
-    }
+    dispatch(login(credentials));
   };
 
   return (
@@ -65,16 +73,8 @@ const Login = () => {
       
       <div className={styles.loginCard}>
         <h2 className={styles.title}>Welcome Back</h2>
-        
-        {authErrorMessage && (
-          <div className={styles.authError}>
-            {authErrorMessage}
-          </div>
-        )}
 
         <form onSubmit={handleLogin}>
-          
-          {/* Email Field */}
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>Email Address</label>
             <div className={styles.inputWrapper}>
@@ -92,7 +92,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Password Field */}
           <div className={styles.formGroup}>
             <label htmlFor="password" className={styles.label}>Password</label>
             <div className={styles.inputWrapper}>
@@ -108,7 +107,6 @@ const Login = () => {
                 autoComplete="current-password"
               />
             </div>
-            {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
           </div>
 
           <button type="submit" className={styles.submitBtn}>

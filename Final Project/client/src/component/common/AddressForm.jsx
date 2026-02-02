@@ -98,7 +98,7 @@ const AddressForm = ({
             <label className={styles.label}>Postal Code</label>
             <input
               type="text"
-              name="postalCode" // Ensure your backend accepts 'postalCode' or map it if it expects 'zipCode'
+              name="postalCode"
               className={styles.input}
               placeholder="Zip/Postal Code"
               value={address.postalCode || ""}

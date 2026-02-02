@@ -24,7 +24,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
 
   // Redux State
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { isAuthenticated, userId } = useSelector((state) => state.auth);
   const { product, quantity, isLoading } = useSelector((state) => state.product);
   
   // Local State
@@ -61,7 +61,11 @@ const ProductDetails = () => {
       return;
     }
     await handleAddToCart();
-    navigate(`/cart/${isAuthenticated.id || 'user'}/my-cart`); 
+    if (userId) {
+      navigate(`/cart/${userId}/my-cart`); 
+    } else {
+      toast.error("User ID missing. Please login again.");
+    }
   };
 
   if (isLoading) return <LoadSpinner />;

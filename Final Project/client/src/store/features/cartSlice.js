@@ -1,14 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api, privateApi } from "../../component/services/api";
+import { privateApi } from "../../component/services/api"; // Only import privateApi
 
-// Fix: Use Query Params instead of FormData for simple fields
+// 1. Add Item (Already correct, but ensure it uses privateApi)
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity }, { rejectWithValue }) => {
+  async ({ productId, quantity }, { rejectWithValue, dispatch, getState }) => {
     try {
+      // Use privateApi
       const response = await privateApi.post("/cartItems/item/add", null, {
         params: { productId, quantity },
       });
+
+      // Fetch updated cart immediately to sync UI
+      const { userId } = getState().auth; 
+      if (userId) {
+        dispatch(getUserCart(userId));
+      }
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -16,11 +24,14 @@ export const addToCart = createAsyncThunk(
   }
 );
 
+// 2. Get User Cart (CRITICAL FIX: Change 'api' to 'privateApi')
 export const getUserCart = createAsyncThunk(
   "cart/getUserCart",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/carts/user/${userId}/cart`);
+      // WAS: const response = await api.get(...);
+      // NOW: Uses privateApi to send the Token
+      const response = await privateApi.get(`/carts/user/${userId}/cart`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -28,11 +39,14 @@ export const getUserCart = createAsyncThunk(
   }
 );
 
+// 3. Update Quantity (FIX: Change 'api' to 'privateApi')
 export const updateQuantity = createAsyncThunk(
   "cart/updateQuantity",
   async ({ cartId, itemId, newQuantity }, { rejectWithValue }) => {
     try {
-      await api.put(
+      // WAS: await api.put(...);
+      // NOW: Uses privateApi
+      await privateApi.put(
         `/cartItems/cart/${cartId}/item/${itemId}/update`, 
         null, 
         { params: { quantity: newQuantity } }
@@ -44,11 +58,14 @@ export const updateQuantity = createAsyncThunk(
   }
 );
 
+// 4. Remove Item (FIX: Change 'api' to 'privateApi')
 export const removeItemFromCart = createAsyncThunk(
   "cart/removeItemFromCart",
   async ({ cartId, itemId }, { rejectWithValue }) => {
     try {
-      await api.delete(`/cartItems/cart/${cartId}/item/${itemId}/remove`);
+      // WAS: await api.delete(...);
+      // NOW: Uses privateApi
+      await privateApi.delete(`/cartItems/cart/${cartId}/item/${itemId}/remove`);
       return itemId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -82,9 +99,7 @@ const cartSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Add to Cart
-      .addCase(addToCart.fulfilled, (state, action) => {
-        // Optimistic update: You might want to refetch the cart or just push if backend returns item
-        // Assuming backend returns success message:
+      .addCase(addToCart.fulfilled, (state) => {
         state.successMessage = "Item added to cart successfully";
       })
       .addCase(addToCart.rejected, (state, action) => {
@@ -97,9 +112,12 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(getUserCart.fulfilled, (state, action) => {
-        state.items = action.payload.items;
-        state.cartId = action.payload.cartId;
-        state.totalAmount = action.payload.totalAmount;
+        // Handle case where cart might be null (new user)
+        if (action.payload) {
+            state.items = action.payload.items;
+            state.cartId = action.payload.cartId;
+            state.totalAmount = action.payload.totalAmount;
+        }
         state.isLoading = false;
       })
       .addCase(getUserCart.rejected, (state, action) => {
@@ -115,7 +133,6 @@ const cartSlice = createSlice({
           item.quantity = newQuantity;
           item.totalPrice = item.product.price * newQuantity;
         }
-        // Recalculate Total
         state.totalAmount = state.items.reduce(
           (total, item) => total + item.totalPrice,
           0

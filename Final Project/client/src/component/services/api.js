@@ -1,5 +1,5 @@
 import axios from "axios";
-import { logoutUser } from "./authService"; // Ensure casing matches filename
+import { logoutUser } from "./authService";
 
 // Use environment variable with a fallback for local development
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:9090/api/v1";
@@ -65,7 +65,12 @@ privateApi.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            // Also apply the safe header update here for queued requests
+            if (originalRequest.headers) {
+              originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            } else {
+              originalRequest.headers = { Authorization: `Bearer ${token}` };
+            }
             return privateApi(originalRequest);
           })
           .catch((err) => {
@@ -84,18 +89,26 @@ privateApi.interceptors.response.use(
         // Store new token
         localStorage.setItem("authToken", newAccessToken);
         
-        // Update the original header
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`; // Fix header assignment
+        // --- SAFE HEADER UPDATE (Implemented as requested) ---
+        if (originalRequest.headers) {
+             originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        } else {
+             originalRequest.headers = { Authorization: `Bearer ${newAccessToken}` };
+        }
 
         // Process any queued requests with the new token
         processQueue(null, newAccessToken);
 
         // Return the original request execution
         return privateApi(originalRequest);
+
       } catch (refreshError) {
-        // If refresh fails, reject all queued requests and logout
+        // If refresh fails, reject all queued requests
         processQueue(refreshError, null);
-        logoutUser();
+        
+        // Redirect to Login with "Session Expired" message
+        logoutUser(); 
+        
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

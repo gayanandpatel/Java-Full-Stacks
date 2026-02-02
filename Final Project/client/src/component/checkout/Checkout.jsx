@@ -137,7 +137,7 @@ const Checkout = () => {
     try {
       const { clientSecret } = await dispatch(
         createPaymentIntent({
-          amount: Math.round(cart.totalAmount * 100),
+          amount: Math.round(cart.totalAmount),
           currency: "inr",
         })
       ).unwrap();

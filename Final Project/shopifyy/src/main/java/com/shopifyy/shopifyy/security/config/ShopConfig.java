@@ -1,6 +1,7 @@
 package com.shopifyy.shopifyy.security.config;
 
 import java.util.List;
+import java.util.Arrays; // Added import
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration; // Added import
+import org.springframework.web.cors.CorsConfigurationSource; // Added import
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Added import
 
 import com.shopifyy.shopifyy.security.jwt.AuthTokenFilter;
 import com.shopifyy.shopifyy.security.jwt.JwtEntryPoint;
@@ -33,15 +35,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class ShopConfig {
+
     @Value("${api.prefix}")
-    private static String API;
-    private static final List<String> SECURED_URLS =
-            List.of(API + "/carts/**", API + "/cartItems/**", API + "/orders/**");
+    private String apiPrefix; // Removed 'static' to ensure value injection works
 
     private final ShopUserDetailsService userDetailsService;
-
     private final JwtEntryPoint authEntryPoint;
-
 
     @Bean
     public ModelMapper modelMapper() {
@@ -73,30 +72,46 @@ public class ShopConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Define secured URLs dynamically using the injected apiPrefix
+        List<String> securedUrls = List.of(
+            apiPrefix + "/carts/**", 
+            apiPrefix + "/cartItems/**", 
+            apiPrefix + "/orders/**"
+        );
 
         http.csrf(AbstractHttpConfigurer::disable)
+                // 1. Apply CORS here in the main security chain
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers(SECURED_URLS.toArray(String[]::new)).authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(securedUrls.toArray(String[]::new)).authenticated()
                         .anyRequest().permitAll());
+        
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
-
     }
 
+    // 2. Define the CORS Bean explicitly
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**") // Apply to all endpoints
-                        .allowedOrigins("http://localhost:5174") // Allow this origin
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow these HTTP methods
-                        .allowedHeaders("*") // Allow all headers
-                        .allowCredentials(true); // Allow credentials
-            }
-        };
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // Allow your frontend origin
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174")); 
+        
+        // Allow all standard methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        
+        // vital: Allow headers including Authorization
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        
+        // Allow credentials (cookies/auth headers)
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
-    /*,"http://buynowdotcom.s3-website-ap-southeast-1.amazonaws.com"*/
 }

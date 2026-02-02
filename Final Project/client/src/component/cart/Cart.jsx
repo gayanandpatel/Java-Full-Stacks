@@ -136,7 +136,7 @@ const Cart = () => {
 
                   {/* Total Price Column */}
                   <div className={styles.totalPrice}>
-                    ${item.totalPrice?.toFixed(2)}
+                    ₹{item.totalPrice?.toFixed(2)}
                   </div>
 
                   {/* Action Column - FIXED: Using FaTrash Icon */}
@@ -159,7 +159,7 @@ const Cart = () => {
               
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span className="fw-bold">${cart.totalAmount?.toFixed(2)}</span>
+                <span className="fw-bold">₹{cart.totalAmount?.toFixed(2)}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
@@ -167,12 +167,12 @@ const Cart = () => {
               </div>
               <div className={styles.summaryRow}>
                 <span>Tax estimate</span>
-                <span>$0.00</span>
+                <span>₹0.00</span>
               </div>
 
               <div className={styles.summaryTotal}>
                 <span>Total</span>
-                <span>${cart.totalAmount?.toFixed(2)}</span>
+                <span>₹{cart.totalAmount?.toFixed(2)}</span>
               </div>
 
               <button onClick={handlePlaceOrder} className={styles.checkoutBtn}>

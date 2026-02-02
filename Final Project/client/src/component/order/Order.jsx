@@ -70,7 +70,7 @@ const Order = () => {
                 
                 <div className={styles.headerGroup}>
                   <span className={styles.label}>Total Amount</span>
-                  <span className={styles.value}>${order.totalAmount.toFixed(2)}</span>
+                  <span className={styles.value}>₹{order.totalAmount.toFixed(2)}</span>
                 </div>
                 
                 <div className={styles.headerGroup}>
@@ -106,7 +106,7 @@ const Order = () => {
 
                     {/* Price & Qty */}
                     <div className={styles.itemPrice}>
-                      <span className={styles.price}>${item.price.toFixed(2)}</span>
+                      <span className={styles.price}>₹{item.price.toFixed(2)}</span>
                       <span className={styles.qty}>Qty: {item.quantity}</span>
                     </div>
                   </div>

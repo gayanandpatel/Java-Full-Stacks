@@ -293,7 +293,7 @@ const UserProfile = () => {
                           <div className={styles.metaGroup}>
                             <span className={styles.metaLabel}>Total</span>
                             <span className={styles.metaValue}>
-                              ${order.totalAmount?.toFixed(2)}
+                              ₹{order.totalAmount?.toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -321,9 +321,9 @@ const UserProfile = () => {
                                 <td>{item.productName}</td>
                                 <td>{item.productBrand}</td>
                                 <td>{item.quantity}</td>
-                                <td>${item.price?.toFixed(2)}</td>
+                                <td>₹{item.price?.toFixed(2)}</td>
                                 <td style={{textAlign: 'right', fontWeight: '600'}}>
-                                  ${(item.quantity * item.price).toFixed(2)}
+                                  ₹{(item.quantity * item.price).toFixed(2)}
                                 </td>
                               </tr>
                             ))}

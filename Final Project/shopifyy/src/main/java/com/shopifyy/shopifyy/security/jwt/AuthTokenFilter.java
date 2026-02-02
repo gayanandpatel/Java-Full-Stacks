@@ -19,7 +19,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -27,7 +29,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
     @Autowired
     private ShopUserDetailsService userDetailsService;
-
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -42,22 +43,28 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            sendErrorResponse(response);
-            return;
+            // Log the specific error for debugging (e.g., ExpiredJwtException)
+            log.error("Authentication check failed: {}", e.getMessage());
+            
+            // Send 401 Unauthorized to trigger the frontend interceptor
+            sendErrorResponse(response, e.getMessage());
+            return; 
         }
         filterChain.doFilter(request, response);
     }
 
-    private void sendErrorResponse(HttpServletResponse response) throws IOException {
+    private void sendErrorResponse(HttpServletResponse response, String internalMessage) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-        ErrorResponse errorResponse = new ErrorResponse("Invalid access token, please long and try again!");
+        
+        // Professional user-facing message
+        ErrorResponse errorResponse = new ErrorResponse("Session expired or invalid token. Please login again.");
+        
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
-        response.getWriter().write(jsonResponse);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 
-    public String parseJwt(HttpServletRequest request) {
+    private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
