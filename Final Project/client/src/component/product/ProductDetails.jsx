@@ -129,8 +129,17 @@ const ProductDetails = () => {
               <span className={styles.taxNote}>Inclusive of all taxes</span>
             </div>
 
-            <div className={styles.stockInfo}>
-              <StockStatus inventory={product.inventory} />
+            <div className={styles.stockWrapper}>
+                {product.inventory > 0 ? (
+                  <span style={{ color: "#28a745", fontWeight: "600", fontSize: "0.85rem" }}>
+                    In Stock
+                  </span>
+                ):(
+                    <span style={{ color: "#dc3545", fontWeight: "600", fontSize: "0.85rem" }}>
+                      Out of Stock
+                    </span>
+                  )
+                }
             </div>
 
             <div className={styles.features}>
