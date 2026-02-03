@@ -53,6 +53,7 @@
   color: #333;
   background: transparent;
   outline: none;
+  appearance: none; 
   -moz-appearance: textfield;
 }
 
