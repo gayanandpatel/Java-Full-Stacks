@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { fetchUserOrders } from "../../store/features/orderSlice";
 import { ToastContainer } from "react-toastify";
 
-// Components
-import ProductImage from "../utils/ProductImage"; // Assuming this exists from previous context
+
+import ProductImage from "../utils/ProductImage";
 import LoadSpinner from "../common/LoadSpinner";
 
-// Styles
 import styles from "./Order.module.css";
 
 const Order = () => {
@@ -51,7 +50,7 @@ const Order = () => {
 
       {orders.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>You haven't placed any orders yet.</p>
+          <p className={styles.emptyText}>You haven&apos;t placed any orders yet.</p>
           <Link to="/products" className={styles.shopBtn}>
             Start Shopping
           </Link>
