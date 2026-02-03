@@ -1,6 +1,3 @@
-import React from "react";
-
-// Import styles
 import styles from "./LoadSpinner.module.css";
 
 const LoadSpinner = () => {
