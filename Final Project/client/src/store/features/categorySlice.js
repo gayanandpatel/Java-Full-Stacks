@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
 
-// --- Async Thunks ---
-
 export const getAllCategories = createAsyncThunk(
   "category/getAllCategories",
   async (_, { rejectWithValue }) => {
@@ -10,15 +8,12 @@ export const getAllCategories = createAsyncThunk(
       const response = await api.get("/categories/all");
       return response.data.data;
     } catch (error) {
-      // Capture backend specific error message
       return rejectWithValue(
         error.response?.data?.message || error.message || "Failed to fetch categories"
       );
     }
   }
 );
-
-// --- Slice ---
 
 const initialState = {
   categories: [],
@@ -30,11 +25,9 @@ const categorySlice = createSlice({
   name: "category",
   initialState,
   reducers: {
-    // Helper to manually add a category to the store (Optimistic updates)
     addCategory: (state, action) => {
       state.categories.push(action.payload);
     },
-    // Clear errors manually if needed
     clearCategoryError: (state) => {
       state.error = null;
     },
@@ -42,7 +35,6 @@ const categorySlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // Fetch Categories
       .addCase(getAllCategories.pending, (state) => {
         state.isLoading = true;
         state.error = null;

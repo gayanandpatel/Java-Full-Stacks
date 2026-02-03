@@ -22,7 +22,6 @@ const searchSlice = createSlice({
       state.searchQuery = "";
       state.selectedCategory = "all";
     },
-    // Alias for backward compatibility if you prefer 'clearFilters'
     clearFilters: (state) => {
       state.searchQuery = "";
       state.selectedCategory = "all";
@@ -38,8 +37,6 @@ export const {
   clearFilters,
 } = searchSlice.actions;
 
-// --- Selectors ---
-// Using selectors is better practice than state.search.searchQuery in components
 export const selectSearchQuery = (state) => state.search.searchQuery;
 export const selectSelectedCategory = (state) => state.search.selectedCategory;
 export const selectSearchState = (state) => state.search;

@@ -56,7 +56,6 @@ const authSlice = createSlice({
       localStorage.removeItem("userRoles");
       localStorage.removeItem("userId");
     },
-    // Clear error message (useful when user navigates away or retries)
     clearError: (state) => {
       state.error = null;
     },
@@ -75,12 +74,10 @@ const authSlice = createSlice({
         state.token = action.payload.accessToken;
 
         try {
-          // Decode token to extract user details
           const decodedToken = jwtDecode(action.payload.accessToken);
           state.roles = decodedToken.roles || [];
           state.userId = decodedToken.id;
 
-          // Persist to local storage
           localStorage.setItem("authToken", action.payload.accessToken);
           localStorage.setItem("userRoles", JSON.stringify(state.roles));
           localStorage.setItem("userId", decodedToken.id);
@@ -89,7 +86,6 @@ const authSlice = createSlice({
           state.error = "Invalid token received from server";
         }
       })
-      // Login Failure
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;

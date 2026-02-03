@@ -1,16 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
 
-// --- Async Thunks ---
-
-// Upload Images
 export const uploadImages = createAsyncThunk(
   "image/uploadImages",
   async ({ productId, files }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
       
-      // Append files
       if (Array.isArray(files)) {
         files.forEach((file) => {
           formData.append("files", file);
@@ -18,12 +14,6 @@ export const uploadImages = createAsyncThunk(
       } else {
         formData.append("files", files);
       }
-      
-      // CRITICAL FIX: 
-      // 1. Send ID in URL (Standard for most backends).
-      // 2. Pass 'headers' config to override any global 'application/json' defaults.
-      // Setting Content-Type to undefined lets the browser set it automatically 
-      // with the correct 'boundary=...' parameter.
       const response = await api.post(
         `/images/upload?productId=${productId}`, 
         formData,
@@ -51,7 +41,6 @@ export const updateProductImage = createAsyncThunk(
       const formData = new FormData();
       formData.append("file", file);
       
-      // Apply the same header fix here
       const response = await api.put(
         `/images/image/${imageId}/update`, 
         formData,
@@ -85,7 +74,6 @@ export const deleteProductImage = createAsyncThunk(
   }
 );
 
-// --- Slice ---
 
 const initialState = {
   uploadedImages: [], 
@@ -160,7 +148,6 @@ const imageSlice = createSlice({
       .addCase(deleteProductImage.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = action.payload?.message || "Image deleted successfully";
-        // Safe ID access
         const deletedId = action.meta.arg.imageId;
         state.uploadedImages = state.uploadedImages.filter(img => img.id !== deletedId);
       })

@@ -1,15 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { privateApi } from "../../component/services/api";
 
-// --- Async Thunks ---
-
-// Place Order
 export const placeOrder = createAsyncThunk(
   "order/placeOrder",
   async ({ userId }, { rejectWithValue }) => {
     try {
       const response = await privateApi.post(`/orders/user/${userId}/place-order`);
-      // The backend returns { message: "...", data: { ...order... } }
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -18,8 +14,6 @@ export const placeOrder = createAsyncThunk(
     }
   }
 );
-
-// Fetch User Order History
 export const fetchUserOrders = createAsyncThunk(
   "order/fetchUserOrders",
   async (userId, { rejectWithValue }) => {
@@ -34,7 +28,6 @@ export const fetchUserOrders = createAsyncThunk(
   }
 );
 
-// Create Payment Intent (Stripe)
 export const createPaymentIntent = createAsyncThunk(
   "order/createPaymentIntent",
   async ({ amount, currency }, { rejectWithValue }) => {
@@ -51,8 +44,6 @@ export const createPaymentIntent = createAsyncThunk(
     }
   }
 );
-
-// --- Slice ---
 
 const initialState = {
   orders: [],
@@ -81,7 +72,6 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // --- Place Order ---
       .addCase(placeOrder.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -89,10 +79,7 @@ const orderSlice = createSlice({
       .addCase(placeOrder.fulfilled, (state, action) => {
         state.isLoading = false;
         
-        // FIX: Read from '.data', not '.order' (Based on ApiResponse.java)
         const newOrder = action.payload.data;
-        
-        // Only push valid objects to prevent 'undefined' errors
         if (newOrder) {
           state.orders.push(newOrder);
           state.currentOrder = newOrder;
@@ -104,7 +91,6 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Fetch User Orders ---
       .addCase(fetchUserOrders.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -118,7 +104,6 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Create Payment Intent ---
       .addCase(createPaymentIntent.pending, (state) => {
         state.isLoading = true;
         state.error = null;

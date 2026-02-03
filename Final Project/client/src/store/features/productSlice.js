@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api, privateApi } from "../../component/services/api";
 
-// --- Async Thunks ---
-
-// Fetch All Products
 export const getAllProducts = createAsyncThunk(
   "product/getAllProducts",
   async (_, { rejectWithValue }) => {
@@ -16,7 +13,6 @@ export const getAllProducts = createAsyncThunk(
   }
 );
 
-// Add New Product (Protected)
 export const addNewProduct = createAsyncThunk(
   "product/addNewProduct",
   async (product, { rejectWithValue }) => {
@@ -29,7 +25,6 @@ export const addNewProduct = createAsyncThunk(
   }
 );
 
-// Update Product (Protected)
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
   async ({ productId, updatedProduct }, { rejectWithValue }) => {
@@ -45,7 +40,6 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
-// Delete Product (Protected)
 export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (productId, { rejectWithValue }) => {
@@ -60,7 +54,6 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-// Fetch All Brands
 export const getAllBrands = createAsyncThunk(
   "product/getAllBrands",
   async (_, { rejectWithValue }) => {
@@ -72,8 +65,6 @@ export const getAllBrands = createAsyncThunk(
     }
   }
 );
-
-// Fetch Distinct Product Names (For Search)
 export const getDistinctProductsByName = createAsyncThunk(
   "product/getDistinctProductsByName",
   async (_, { rejectWithValue }) => {
@@ -86,7 +77,6 @@ export const getDistinctProductsByName = createAsyncThunk(
   }
 );
 
-// Get Single Product by ID (CRITICAL FIX HERE)
 export const getProductById = createAsyncThunk(
   "product/getProductById",
   async (productId, { rejectWithValue }) => {
@@ -98,8 +88,6 @@ export const getProductById = createAsyncThunk(
     }
   }
 );
-
-// Get Products by Category
 export const getProductsByCategory = createAsyncThunk(
   "product/getProductsByCategory",
   async (categoryId, { rejectWithValue }) => {
@@ -112,8 +100,6 @@ export const getProductsByCategory = createAsyncThunk(
   }
 );
 
-// --- Slice ---
-
 const initialState = {
   products: [],
   product: null,
@@ -121,7 +107,7 @@ const initialState = {
   brands: [],
   selectedBrands: [],
   quantity: 1,
-  isLoading: false, // Ensure this defaults to false
+  isLoading: false,
   error: null,
   successMessage: null,
 };
@@ -153,7 +139,6 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // --- Fetch All Products ---
       .addCase(getAllProducts.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -166,8 +151,6 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-
-      // --- Get Product By ID (Fixed Handlers) ---
       .addCase(getProductById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -177,11 +160,10 @@ const productSlice = createSlice({
         state.product = action.payload;
       })
       .addCase(getProductById.rejected, (state, action) => {
-        state.isLoading = false; // Stops the spinner on error
+        state.isLoading = false;
         state.error = action.payload;
       })
 
-      // --- Add New Product ---
       .addCase(addNewProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -196,7 +178,6 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Update Product ---
       .addCase(updateProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -204,7 +185,6 @@ const productSlice = createSlice({
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.isLoading = false;
         state.product = action.payload.data;
-        // Update list view if item exists there
         const index = state.products.findIndex(p => p.id === action.payload.data.id);
         if (index !== -1) state.products[index] = action.payload.data;
         state.successMessage = "Product updated successfully";
@@ -214,7 +194,6 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Delete Product ---
       .addCase(deleteProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -231,7 +210,6 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // --- Other Fetchers ---
       .addCase(getAllBrands.fulfilled, (state, action) => {
         state.brands = action.payload;
       })

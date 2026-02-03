@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api, privateApi } from "../../component/services/api";
 import axios from "axios";
 
-// --- Async Thunks ---
-
 export const getUserById = createAsyncThunk(
   "user/getUserById",
   async (userId, { rejectWithValue }) => {
@@ -56,14 +54,12 @@ export const getCountryNames = createAsyncThunk(
   }
 );
 
-// --- Address Management Thunks ---
 
 export const addAddress = createAsyncThunk(
   "user/addAddress",
   async ({ address, userId }, { dispatch, rejectWithValue }) => {
     try {
       const response = await privateApi.post(`/addresses/${userId}/new`, [address]);
-      // CRITICAL FIX: Immediately re-fetch user data to get the REAL DB IDs
       if (userId) {
         dispatch(getUserById(userId));
       }
@@ -78,11 +74,7 @@ export const updateAddress = createAsyncThunk(
   "user/updateAddress",
   async ({ id, userId, address }, { dispatch, rejectWithValue }) => {
     try {
-      // 1. Sanitize the ID
       const addressId = encodeURIComponent(String(id).trim());
-
-      // 2. Sanitize Payload (Prevent 500 Errors)
-      // We strip non-numeric characters from phone numbers to prevent backend crashes
       const cleanPayload = {
         street: address.street || "",
         city: address.city || "",
@@ -95,7 +87,6 @@ export const updateAddress = createAsyncThunk(
 
       const response = await privateApi.put(`/addresses/${addressId}/update`, cleanPayload);
 
-      // CRITICAL FIX: Sync with Database immediately
       if (userId) {
         dispatch(getUserById(userId));
       }
@@ -113,8 +104,6 @@ export const deleteAddress = createAsyncThunk(
     try {
       const addressId = encodeURIComponent(String(id).trim());
       const response = await privateApi.delete(`/addresses/${addressId}/delete`);
-      
-      // CRITICAL FIX: Sync with Database immediately
       if (userId) {
         dispatch(getUserById(userId));
       }
@@ -128,8 +117,6 @@ export const deleteAddress = createAsyncThunk(
     }
   }
 );
-
-// --- Slice ---
 
 const initialState = {
   user: null,
@@ -160,7 +147,6 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Get User
       .addCase(getUserById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -173,7 +159,6 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -187,11 +172,9 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Countries
       .addCase(getCountryNames.fulfilled, (state, action) => {
         state.countryNames = action.payload;
       })
-      // Add Address
       .addCase(addAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -199,27 +182,22 @@ const userSlice = createSlice({
       .addCase(addAddress.fulfilled, (state) => {
         state.isLoading = false;
         state.successMessage = "Address added successfully";
-        // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(addAddress.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Update Address
       .addCase(updateAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(updateAddress.fulfilled, (state) => {
         state.isLoading = false;
-        state.successMessage = "Address updated successfully";
-        // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(updateAddress.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Delete Address
       .addCase(deleteAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -227,7 +205,6 @@ const userSlice = createSlice({
       .addCase(deleteAddress.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successMessage = action.payload.message || "Address deleted";
-         // No manual state update needed here because we dispatch(getUserById)
       })
       .addCase(deleteAddress.rejected, (state, action) => {
         state.isLoading = false;
