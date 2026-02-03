@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllCategories,
   addCategory,
 } from "../../store/features/categorySlice";
 
-// Import styles
+
 import styles from "./CategorySelector.module.css";
 
 const CategorySelector = ({
@@ -25,7 +26,7 @@ const CategorySelector = ({
 
   const handleAddNewCategory = () => {
     if (newCategory !== "") {
-      // Logic preserved: passing object { name: newCategory }
+      
       dispatch(addCategory({ name: newCategory }));
       onCategoryChange(newCategory);
       setNewCategory("");
@@ -83,6 +84,16 @@ const CategorySelector = ({
       )}
     </div>
   );
+};
+
+
+CategorySelector.propTypes = {
+  selectedCategory: PropTypes.string.isRequired,
+  onCategoryChange: PropTypes.func.isRequired,
+  newCategory: PropTypes.string.isRequired,
+  showNewCategoryInput: PropTypes.bool.isRequired,
+  setNewCategory: PropTypes.func.isRequired,
+  setShowNewCategoryInput: PropTypes.func.isRequired,
 };
 
 export default CategorySelector;
