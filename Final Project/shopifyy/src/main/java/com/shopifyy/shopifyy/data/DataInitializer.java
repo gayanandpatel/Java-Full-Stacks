@@ -43,15 +43,15 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
         Role adminRole = Optional.ofNullable(roleRepository.findByName("ROLE_ADMIN"))
                 .orElseThrow(() -> new EntityNotFoundException("Role not found"));
         for (int i = 1; i<=3; i++){
-            String defaultEmail = "admin"+i+"@email.com";
+            String defaultEmail = "gayanand.patel" +i+ "@gmail.com";
             if (userRepository.existsByEmail(defaultEmail)){
                 continue;
             }
             User user = new User();
             user.setFirstName("Admin");
-            user.setLastName("Shop User" + i);
+            user.setLastName("admin" + i);
             user.setEmail(defaultEmail);
-            user.setPassword(passwordEncoder.encode("123456"));
+            user.setPassword(passwordEncoder.encode("123456789"));
             user.setRoles(Set.of(adminRole));
             userRepository.save(user);
         }

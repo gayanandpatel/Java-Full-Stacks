@@ -34,7 +34,7 @@ public class UserService implements IUserService {
     @Override
     public User createUser(CreateUserRequest request) {
         Role userRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"))
-                .orElseThrow(() -> new EntityNotFoundException("Role nor found!"));
+                .orElseThrow(() -> new EntityNotFoundException("Role not found!"));
         
         return Optional.of(request)
                 .filter(user -> !userRepository.existsByEmail(request.getEmail()))
