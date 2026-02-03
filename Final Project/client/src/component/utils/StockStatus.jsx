@@ -1,11 +1,11 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from "react-icons/fa";
 
-// Import Styles
+
 import styles from "./StockStatus.module.css";
 
 const StockStatus = ({ inventory }) => {
-  // Determine status
+
   let statusClass = styles.inStock;
   let icon = <FaCheckCircle className={styles.icon} />;
   let text = `${inventory} In Stock`;
@@ -26,6 +26,10 @@ const StockStatus = ({ inventory }) => {
       <span>{text}</span>
     </div>
   );
+};
+
+StockStatus.propTypes = {
+  inventory: PropTypes.number.isRequired,
 };
 
 export default StockStatus;

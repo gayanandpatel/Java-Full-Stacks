@@ -1,11 +1,9 @@
-/* QuantityUpdater.module.css */
-
 .wrapper {
   display: flex;
   align-items: center;
   border: 1px solid #ddd;
-  border-radius: 8px; /* Slightly rounded corners */
-  overflow: hidden; /* Keeps children inside the border radius */
+  border-radius: 8px;
+  overflow: hidden; 
   width: fit-content;
   background-color: #fff;
   transition: border-color 0.2s;
@@ -55,7 +53,6 @@
   color: #333;
   background: transparent;
   outline: none;
-  /* Remove spin buttons for numbers */
   -moz-appearance: textfield;
 }
 

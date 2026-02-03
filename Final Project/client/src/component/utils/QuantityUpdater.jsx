@@ -1,7 +1,5 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { BsDash, BsPlus } from "react-icons/bs";
-
-// Import styles
 import styles from "./QuantityUpdater.module.css";
 
 const QuantityUpdater = ({ disabled, quantity, onIncrease, onDecrease }) => {
@@ -10,7 +8,7 @@ const QuantityUpdater = ({ disabled, quantity, onIncrease, onDecrease }) => {
       <button
         onClick={onDecrease}
         className={styles.btn}
-        disabled={disabled || quantity <= 1} // Disable minus if quantity is 1
+        disabled={disabled || quantity <= 1}
         aria-label="Decrease quantity"
         type="button"
       >
@@ -38,6 +36,19 @@ const QuantityUpdater = ({ disabled, quantity, onIncrease, onDecrease }) => {
       </button>
     </div>
   );
+};
+
+
+QuantityUpdater.propTypes = {
+  disabled: PropTypes.bool,
+  quantity: PropTypes.number.isRequired,
+  onIncrease: PropTypes.func.isRequired,
+  onDecrease: PropTypes.func.isRequired,
+};
+
+
+QuantityUpdater.defaultProps = {
+  disabled: false,
 };
 
 export default QuantityUpdater;

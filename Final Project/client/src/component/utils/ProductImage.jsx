@@ -32,7 +32,6 @@ ProductImage.propTypes = {
         setIsLoading(true);
         setError(false);
         
-        // Try to fetch the image assuming 'id' is a direct Image ID
         let response = await fetch(
           `${BASE_URL}/images/image/download/${id}`
         );
@@ -57,7 +56,6 @@ ProductImage.propTypes = {
                 
                 response = await fetch(`${BASE_URL}/images/image/download/${realImageId}`);
               } else {
-                // No image found in product details
                 throw new Error("No image associated with this product");
               }
             } else {
