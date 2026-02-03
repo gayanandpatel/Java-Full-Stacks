@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-// Actions
+
 import {
   getAllProducts,
   getProductsByCategory,
@@ -14,21 +14,18 @@ import {
   setSelectedCategory 
 } from "../../store/features/searchSlice";
 
-// Components
 import ProductCard from "./ProductCard";
 import SearchBar from "../search/SearchBar";
 import Paginator from "../common/Paginator";
 import SideBar from "../common/SideBar";
 import LoadSpinner from "../common/LoadSpinner";
 
-// Import styles
 import styles from "./Products.module.css";
 
 const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dispatch = useDispatch();
   
-  // Redux Selectors
   const { products, selectedBrands, isLoading } = useSelector((state) => state.product);
   const { searchQuery, selectedCategory } = useSelector((state) => state.search);
   const { itemsPerPage, currentPage } = useSelector((state) => state.pagination);
@@ -38,41 +35,33 @@ const Products = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialSearchQuery = queryParams.get("search") || name || "";
 
-  // 1. Fetch Products Logic
+  // Fetch Products Logic
   useEffect(() => {
     if (categoryId) {
       dispatch(getProductsByCategory(categoryId));
     } else {
       dispatch(getAllProducts());
-      // FIX: If we are on the main products page (no categoryId), 
-      // explicitly reset the category filter to 'all' to prevent stuck state.
       dispatch(setSelectedCategory("all"));
     }
   }, [dispatch, categoryId]);
 
-  // 2. Sync Search Query from URL
+  // Sync Search Query from URL
   useEffect(() => {
     dispatch(setInitialSearchQuery(initialSearchQuery));
   }, [initialSearchQuery, dispatch]);
 
-  // 3. Filtering Logic (Client-side)
+  // Filtering Logic (Client-side)
   useEffect(() => {
     if (!products) return;
 
     const results = products.filter((product) => {
-      // Name Search
       const matchesQuery = product.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-
-      // Category Filter
-      // We check if selectedCategory is 'all' OR if it matches the product's category
       const matchesCategory =
         selectedCategory === "all" ||
         (product.category?.name && 
          product.category.name.toLowerCase() === selectedCategory.toLowerCase());
-
-      // Brand Filter
       const matchesBrand =
         selectedBrands.length === 0 ||
         selectedBrands.some((selectedBrand) =>
@@ -84,7 +73,7 @@ const Products = () => {
     setFilteredProducts(results);
   }, [searchQuery, selectedCategory, selectedBrands, products]);
 
-  // 4. Update Pagination
+  // Update Pagination
   useEffect(() => {
     dispatch(setTotalItems(filteredProducts.length));
   }, [filteredProducts, dispatch]);

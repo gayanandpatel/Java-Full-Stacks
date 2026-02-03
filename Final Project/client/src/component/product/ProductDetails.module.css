@@ -121,7 +121,7 @@
 .price {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #B12704; /* Amazon Red for price */
+  color: #B12704; 
   display: inline-block;
   margin-right: 10px;
 }

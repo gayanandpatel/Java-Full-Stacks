@@ -1,31 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
-// Actions
 import {
   getProductById,
   updateProduct,
 } from "../../store/features/productSlice";
 import { deleteProductImage } from "../../store/features/imageSlice";
 
-// Components
 import LoadSpinner from "../common/LoadSpinner";
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
 import ProductImage from "../utils/ProductImage";
 import ImageUpdater from "../image/ImageUpdater";
 
-// Styles
 import styles from "./ProductUpdate.module.css";
 
 const ProductUpdate = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
   
-  // Local State
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);

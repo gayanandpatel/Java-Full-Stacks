@@ -1,9 +1,7 @@
-/* AddProduct.module.css */
-
 .pageContainer {
   min-height: 80vh;
   padding: 40px 20px;
-  background-color: #f8f9fa; /* Light grey background for the page */
+  background-color: #f8f9fa;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   display: flex;
   justify-content: center;
@@ -117,7 +115,6 @@
   color: #333;
 }
 
-/* Step 2 Specific Styles */
 .stepContainer {
   text-align: center;
 }

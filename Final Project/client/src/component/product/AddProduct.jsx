@@ -188,7 +188,7 @@ const AddProduct = () => {
           </form>
         )}
 
-        {/* STEP 2: Image Upload */}
+        {/* Image Upload */}
         {activeStep === 1 && (
           <div className={styles.stepContainer}>
             <p className={styles.stepTitle}>
@@ -204,7 +204,6 @@ const AddProduct = () => {
               >
                 Back to Details
               </button>
-              {/* Optional: Add a "Finish" button that redirects to product list */}
             </div>
           </div>
         )}

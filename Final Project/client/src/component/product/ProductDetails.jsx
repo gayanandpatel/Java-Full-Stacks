@@ -1,38 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaShoppingCart, FaStar, FaArrowLeft, FaTruck, FaShieldAlt } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 
-// Actions
 import { getProductById, setQuantity } from "../../store/features/productSlice";
 import { addToCart } from "../../store/features/cartSlice";
 
-// Components
 import ImageZoomify from "../common/ImageZoomify";
 import QuantityUpdater from "../utils/QuantityUpdater";
-import StockStatus from "../utils/StockStatus";
 import ProductImage from "../utils/ProductImage";
 import LoadSpinner from "../common/LoadSpinner";
 
-// Styles
 import styles from "./ProductDetails.module.css";
 
 const ProductDetails = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Redux State
   const { isAuthenticated, userId } = useSelector((state) => state.auth);
   const { product, quantity, isLoading } = useSelector((state) => state.product);
   
-  // Local State
   const [activeImageId, setActiveImageId] = useState(null);
 
   useEffect(() => {
     dispatch(getProductById(productId));
-    // Reset quantity to 1 when viewing a new product
     dispatch(setQuantity(1));
   }, [dispatch, productId]);
 

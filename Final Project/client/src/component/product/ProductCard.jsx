@@ -1,22 +1,17 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
-// Actions & Utils
 import { deleteProduct } from "../../store/features/productSlice";
 import ProductImage from "../utils/ProductImage";
-// Removed StockStatus import to implement custom logic here
-// import StockStatus from "../utils/StockStatus";
 
-// Styles
 import styles from "./ProductCard.module.css";
 
 const ProductCard = ({ products }) => {
   const dispatch = useDispatch();
   
-  // Auth State
   const userRoles = useSelector((state) => state.auth.roles);
   const isAdmin = userRoles.includes("ROLE_ADMIN");
 
@@ -63,7 +58,6 @@ const ProductCard = ({ products }) => {
               ₹{product.price}
             </div>
 
-            {/* Stock Status - FIXED: Shows text only, no numbers */}
             <div className={styles.stockWrapper}>
               {product.inventory > 0 ? (
                 <span style={{ color: "#28a745", fontWeight: "600", fontSize: "0.85rem" }}>
@@ -75,10 +69,7 @@ const ProductCard = ({ products }) => {
                 </span>
               )}
             </div>
-
-            {/* Actions */}
             <div className={styles.actions}>
-              {/* Add To Cart */}
               <Link
                 to={`/product/${product.id}/details`}
                 className={styles.addToCartBtn}
@@ -116,3 +107,20 @@ const ProductCard = ({ products }) => {
 };
 
 export default ProductCard;
+
+ProductCard.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      inventory: PropTypes.number,
+      images: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        })
+      ),
+    })
+  ),
+};
