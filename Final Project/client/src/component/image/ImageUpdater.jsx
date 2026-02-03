@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import PropTypes from "prop-types";
 import {
   uploadImages,
   updateProductImage,
 } from "../../store/features/imageSlice";
 
-// Import styles
+
 import styles from "./ImageUpdater.module.css";
 
 const ImageUpdater = ({
@@ -17,6 +18,14 @@ const ImageUpdater = ({
   selectedImage,
 }) => {
   const fileInputRef = useRef(null);
+
+ImageUpdater.propTypes = {
+  show: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  selectedImageId: PropTypes.string,
+  productId: PropTypes.string.isRequired,
+  selectedImage: PropTypes.object,
+};
   const dispatch = useDispatch();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -56,14 +65,12 @@ const ImageUpdater = ({
     try {
       let result;
       if (selectedImageId) {
-        // Update existing image
         result = await dispatch(
           updateProductImage({ imageId: selectedImageId, file: selectedFile })
         ).unwrap();
       } else {
-        // Upload new image
         result = await dispatch(
-          uploadImages({ productId, files: [selectedFile] }) // API expects array
+          uploadImages({ productId, files: [selectedFile] })
         ).unwrap();
       }
       toast.success(result.message || "Operation successful");
