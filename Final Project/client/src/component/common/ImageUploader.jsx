@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { nanoid } from "nanoid";
 import { uploadImages } from "../../store/features/imageSlice";
 import { toast } from "react-toastify";
 import { BsPlus, BsDash } from "react-icons/bs";
 import { useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import styles from "./ImageUploader.module.css";
 
 const ImageUploader = ({ productId }) => {
@@ -16,15 +17,15 @@ const ImageUploader = ({ productId }) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // Only add files that have a name (basic validation)
+    
     const newImages = files
-      .filter(file => file.name)
+      .filter((file) => file.name)
       .map((file) => ({
         id: nanoid(),
         name: file.name,
         file,
       }));
-    
+
     setImages((prevImages) => [...prevImages, ...newImages]);
   };
 
@@ -44,29 +45,29 @@ const ImageUploader = ({ productId }) => {
       toast.error("Product ID is missing. Please save the product details first.");
       return;
     }
+
     
-    // STRICT VALIDATION: Ensure we only send valid File objects
     const validFiles = images
-      .map(img => img.file)
-      .filter(file => file instanceof File);
+      .map((img) => img.file)
+      .filter((file) => file instanceof File);
 
     if (validFiles.length > 0) {
       try {
         const result = await dispatch(
-          uploadImages({ 
-            productId, 
-            files: validFiles 
+          uploadImages({
+            productId,
+            files: validFiles,
           })
         ).unwrap();
+
         
-        // Success Logic
         clearFileInputs();
-        setImages([]); 
-        setImageInputs([{ id: nanoid() }]); 
+        setImages([]);
+        setImageInputs([{ id: nanoid() }]);
         toast.success(result.message || "Images uploaded successfully!");
       } catch (error) {
         console.error("Upload error details:", error);
-        toast.error(typeof error === 'string' ? error : "Failed to upload images.");
+        toast.error(typeof error === "string" ? error : "Failed to upload images.");
       }
     } else {
       toast.warning("Please select at least one valid image file.");
@@ -84,7 +85,11 @@ const ImageUploader = ({ productId }) => {
       <form onSubmit={handleImageUpload}>
         <div className={styles.header}>
           <h5 className={styles.title}>Product Images</h5>
-          <button type="button" onClick={handleAddImageInput} className={styles.addMoreBtn}>
+          <button
+            type="button"
+            onClick={handleAddImageInput}
+            className={styles.addMoreBtn}
+          >
             <BsPlus className={styles.icon} /> Add More
           </button>
         </div>
@@ -115,7 +120,13 @@ const ImageUploader = ({ productId }) => {
         </div>
 
         {images.length > 0 && (
-          <div style={{ marginBottom: '15px', fontSize: '0.9rem', color: '#666' }}>
+          <div
+            style={{
+              marginBottom: "15px",
+              fontSize: "0.9rem",
+              color: "#666",
+            }}
+          >
             {images.length} file(s) selected
           </div>
         )}
@@ -126,6 +137,13 @@ const ImageUploader = ({ productId }) => {
       </form>
     </div>
   );
+};
+
+ImageUploader.propTypes = {
+  productId: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
 };
 
 export default ImageUploader;
