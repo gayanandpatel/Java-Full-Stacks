@@ -6,10 +6,8 @@ import {
 } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
-// Layouts
 import RootLayout from "./component/layout/RootLayout";
 
-// Components
 import Home from "./component/home/Home";
 import Products from "./component/product/Products";
 import ProductDetails from "./component/product/ProductDetails";
@@ -22,7 +20,6 @@ import UserProfile from "./component/user/UserProfile";
 import Checkout from "./component/checkout/Checkout";
 import Unauthorized from "./component/Unauthorized";
 
-// Auth
 import ProtectedRoute from "./component/auth/ProtectedRoute";
 
 const router = createBrowserRouter(
@@ -55,12 +52,10 @@ const router = createBrowserRouter(
         <Route path="user-profile" element={<UserProfile />} />
         <Route path="user-profile/:userId/profile" element={<UserProfile />} />
         
-        {/* FIX: Simplified Routes (No IDs in URL) */}
         <Route path="cart" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
       </Route>
 
-      {/* --- Protected Routes: Admin Only --- */}
       <Route
         element={
           <ProtectedRoute useOutlet={true} allowedRoles={["ROLE_ADMIN"]} />

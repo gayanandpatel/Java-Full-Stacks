@@ -1,5 +1,4 @@
-/* Hero.css */
-.hero
+ .hero
 {
     background-size: cover;
     background-position: center;
@@ -12,7 +11,6 @@
     padding: 20px;
     margin-top: 20px;
     position: relative;
-    /* z-index: -1;  */
 }
 
 .hero-content
@@ -73,22 +71,18 @@
 @media (max-width: 1200px)
 {
 
-    /* Medium screens */
     .home-product-card
     {
         width: calc(33.33% - 30px);
-        /* 3 cards per row */
     }
 }
 
 @media (max-width: 992px)
 {
 
-    /* Small screens */
     .home-product-card
     {
         width: calc(50% - 30px);
-        /* 2 cards per row */
     }
 }
 
@@ -97,7 +91,6 @@
     .home-product-card
     {
         width: calc(100% - 30px);
-        /* 1 card per row */
     }
 }
 
@@ -159,7 +152,6 @@
     font-weight: lighter;
 }
 
-/* HeroSlider.css */
 .hero-slider
 {
     width: 100%;
@@ -174,7 +166,6 @@
     display: block;
 }
 
-/* Start product details page */
 .product-details
 {
     display: flex;
@@ -254,9 +245,6 @@
     font-size: 16px;
 }
 
-/* End product details page */
-
-/* Start the side bar */
 .sidebar
 {
     position: sticky;
@@ -264,9 +252,6 @@
     height: 100vh;
 }
 
-/* End the side bar */
-
-/* Start Buttons */
 .buy-now-button
 {
     padding: 10px 20px;
@@ -358,13 +343,8 @@
 .shop-now-button:hover
 {
     background-color: var(--search-button-color)
-        /* Darker shade on hover */
 }
 
-/* End Buttons */
-
-
-/* Start mega footer */
 .mega-footer
 {
     background-color: #333;
@@ -434,9 +414,6 @@
     border-top: 1px solid #444;
 }
 
-/* End mega footer */
-
-/* Start navbar */
 .nav-bg
 {
     background-color: #f1f0f0
@@ -448,10 +425,6 @@
     font-weight: 900;
 }
 
-/* End navbar */
-
-
-/* Start sidebar */
 .sidebar
 {
     padding: 1rem;
@@ -529,10 +502,6 @@
     transform: rotate(45deg);
 }
 
-/* End sidebar */
-
-/* product update form */
-
 .image-gallery
 {
     display: flex;
@@ -571,5 +540,4 @@
     --dark-background: #000000b3;
     --nav-background: #f1f0f0;
 
-    /* Default color */
 }
