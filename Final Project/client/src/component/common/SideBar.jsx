@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaCheck, FaFilter, FaUndo } from "react-icons/fa";
 
-// Actions
+
 import {
   getAllBrands,
   filterByBrands,
 } from "../../store/features/productSlice";
 
-// Import styles
 import styles from "./SideBar.module.css";
 
 const SideBar = () => {
@@ -23,13 +22,9 @@ const SideBar = () => {
     dispatch(filterByBrands({ brand, isChecked }));
   };
 
-  // Helper to clear only brand filters
+
   const handleClearBrands = () => {
-    // You might need to add a 'clearBrands' action to your slice, 
-    // or manually uncheck all. For now, we can loop or just reload.
-    // Assuming you implement a clear action, otherwise this button 
-    // can just uncheck purely locally if the slice supports it.
-    // Ideally: dispatch(clearBrandFilters());
+
     brands.forEach(brand => {
         if(selectedBrands.includes(brand)) {
             dispatch(filterByBrands({ brand, isChecked: false }));
@@ -76,13 +71,6 @@ const SideBar = () => {
           ))}
         </div>
       </div>
-
-      {/* Placeholder for future filters (Price, Rating, etc.) */}
-      {/* <div className={styles.section}>
-         <h4 className={styles.sectionTitle}>Price Range</h4>
-         ...
-      </div> */}
-      
     </div>
   );
 };
