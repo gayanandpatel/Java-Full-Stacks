@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../store/features/userSlice";
 import { toast, ToastContainer } from "react-toastify";
 import { Link } from "react-router-dom";
 import AddressForm from "../common/AddressForm";
 
-// Import Styles
 import styles from "./UserRegistration.module.css";
 
 const UserRegistration = () => {
@@ -56,7 +55,6 @@ const UserRegistration = () => {
   };
 
   const removeAddress = (index) => {
-    // Prevent removing the last address if desired, or handle empty state
     if (addresses.length === 1) {
       toast.warn("You must provide at least one address.");
       return;
@@ -175,7 +173,7 @@ const UserRegistration = () => {
                   onChange={(e) => handleAddressChange(index, e)}
                   onCancel={() => removeAddress(index)}
                   showButtons={true} 
-                  showCheck={false} // We don't need checkmark here, just remove button
+                  showCheck={false}
                   showTitle={false}
                   showAddressType={true}
                 />

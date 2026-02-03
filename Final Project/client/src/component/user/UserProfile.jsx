@@ -4,14 +4,12 @@ import { useParams, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { nanoid } from "nanoid";
 
-// Icons
 import { 
   FaTrash, FaEdit, FaPlus, FaMapMarkerAlt, 
   FaSortAmountDown, FaSortAmountUp, FaBoxOpen, FaShoppingBag,
-  FaExclamationCircle // Added for the warning modal
+  FaExclamationCircle
 } from "react-icons/fa";
 
-// Actions
 import { fetchUserOrders } from "../../store/features/orderSlice";
 import {
   updateAddress,
@@ -21,31 +19,26 @@ import {
   getUserById,
 } from "../../store/features/userSlice";
 
-// Components
 import AddressForm from "../common/AddressForm";
 import LoadSpinner from "../common/LoadSpinner";
 import ProductImage from "../utils/ProductImage"; 
 import placeholder from "../../assets/images/placeholder.png";
 
-// Import Styles
 import styles from "./UserProfile.module.css";
 
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { userId } = useParams();
   
-  // Redux Selectors
   const user = useSelector((state) => state.user.user);
   const loading = useSelector((state) => state.order.loading);
   const orders = useSelector((state) => state.order.orders);
 
-  // Local State
   const [isEditing, setIsEditing] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // --- Modal State ---
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
 
@@ -58,7 +51,6 @@ const UserProfile = () => {
     mobileNumber: "",
   });
 
-  // --- Sorting Logic (Kept same) ---
   const sortedOrders = [...(orders || [])].sort((a, b) => {
     if (!a || !b) return 0;
     const dateA = new Date(a.orderDate);
@@ -86,7 +78,6 @@ const UserProfile = () => {
   };
 
   const handleAddAddress = async () => {
-    // ... existing logic ...
     const updatedAddressList = [ ...user.addressList, { ...newAddress, id: nanoid() } ];
     dispatch(setUserAddresses(updatedAddressList));
     try {
@@ -100,7 +91,6 @@ const UserProfile = () => {
   };
 
   const handleUpdateAddress = async (id) => {
-    // ... existing logic ...
     const updatedAddressList = user.addressList.map((address) =>
       address.id === id ? { ...newAddress, id } : address
     );
@@ -115,21 +105,20 @@ const UserProfile = () => {
     }
   };
 
-  // --- NEW: Delete Modal Handlers ---
 
-  // 1. Opens the modal
+  //  Opens the modal
   const openDeleteModal = (id) => {
     setAddressToDelete(id);
     setShowDeleteModal(true);
   };
 
-  // 2. Closes the modal
+  // Closes the modal
   const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setAddressToDelete(null);
   };
 
-  // 3. Performs the actual delete (Async)
+  // Performs the actual delete (Async)
   const confirmDelete = async () => {
     if (!addressToDelete) return;
 
@@ -148,7 +137,6 @@ const UserProfile = () => {
       toast.success(response.message);
     } catch (error) {
       toast.error(error.message || "Failed to delete");
-      // Revert if failed (optional, usually re-fetching profile fixes this)
       dispatch(getUserById(userId)); 
     } finally {
       setAddressToDelete(null);
@@ -169,7 +157,6 @@ const UserProfile = () => {
     setEditingAddressId(null);
   };
 
-  // --- Effects ---
   useEffect(() => {
     if (userId) dispatch(getUserById(userId));
     dispatch(fetchUserOrders(userId));
@@ -212,7 +199,6 @@ const UserProfile = () => {
           </div>
         </div>
       )}
-      {/* --------------------------------- */}
 
       <h2 className={styles.pageTitle}>My Dashboard</h2>
 
@@ -286,7 +272,6 @@ const UserProfile = () => {
                           <FaEdit />
                         </button>
                         
-                        {/* UPDATE: Change onClick to openDeleteModal */}
                         <button 
                           className={`${styles.iconBtn} ${styles.deleteIcon}`}
                           onClick={() => openDeleteModal(address.id)}
@@ -303,13 +288,9 @@ const UserProfile = () => {
               </div>
             </section>
 
-            {/* ... Order History Section (Unchanged) ... */}
             <section className={styles.contentSection}>
-               {/* (Keep existing order history code exactly as is) */}
                <div className={styles.sectionHeader}>
                 <h4 className={styles.sectionTitle}>Order History</h4>
-                 {/* ... (rest of the order history code) ... */}
-                  {/* Just collapsing for brevity since no changes needed here */}
                    {orders && orders.length > 0 && (
                   <div className={styles.sortControls}>
                     <button 
@@ -368,11 +349,8 @@ const UserProfile = () => {
                         <div className={styles.itemsContainer}>
                           {Array.isArray(order.items) && order.items.map((item, i) => (
                             <div key={i} className={styles.itemRow}>
-                              {/* Inside your orders map loop in UserProfile.jsx */}
                               <div className={styles.itemImage}>
                                 <ProductImage 
-                                  // This will now work even if it's a Product ID (like 31) because 
-                                  // the fallback URL is fixed.
                                   productId={item.productId} 
                                 />
                               </div>
