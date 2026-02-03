@@ -1,4 +1,3 @@
-import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -15,19 +14,10 @@ const HeroSlider = () => {
     infinite: true,
     speed: 1000, 
     autoplay: true,
-    autoplaySpeed: 3000, // Fixed naming convention (camelCase)
-    fade: true, // Adds a smoother cross-fade effect
+    autoplaySpeed: 3000,
+    fade: true, 
     arrows: false,
     dots: false,
-  };
-
-  const imageStyle = {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    position: "absolute",
-    top: 0,
-    left: 0
   };
 
   return (
@@ -35,9 +25,8 @@ const HeroSlider = () => {
       <Slider {...settings} style={{ height: "100%" }}>
         {images.map((img, index) => (
           <div key={index} style={{ height: "100%" }}>
-            {/* Using inline styles here ensures the background cover works perfectly */}
             <div style={{ 
-               height: "600px", // Match Hero container height
+               height: "600px", 
                backgroundImage: `url(${img})`,
                backgroundSize: 'cover',
                backgroundPosition: 'center'

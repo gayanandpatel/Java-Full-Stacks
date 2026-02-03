@@ -1,12 +1,10 @@
-/* Hero.module.css */
 .heroContainer {
   position: relative;
   width: 100%;
-  /* Reduced height for modern e-commerce standard */
   height: 380px; 
-  margin-top: 10px; /* Slight spacing from navbar */
+  margin-top: 10px; 
   overflow: hidden;
-  background-color: #f1f3f6; /* Common e-commerce background gray */
+  background-color: #f1f3f6;
 }
 
 .sliderWrapper {
@@ -14,12 +12,11 @@
   height: 100%;
 }
 
-/* Subtle gradient only on the bottom or left, not covering the whole image */
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40%; /* Only cover left side for text readability */
+  width: 40%;
   height: 100%;
   background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0));
   z-index: 1;
@@ -29,11 +26,11 @@
 .contentWrapper {
   position: absolute;
   top: 50%;
-  left: 5%; /* Left aligned */
+  left: 5%;
   transform: translateY(-50%);
   z-index: 2;
   max-width: 500px;
-  text-align: left; /* Left align text */
+  text-align: left;
   color: #fff;
 }
 
@@ -53,12 +50,12 @@
 }
 
 .brandHighlight {
-  color: #ffc107; /* Brighter yellow/gold for contrast */
+  color: #ffc107; 
 }
 
 .primaryBtn {
   padding: 12px 35px;
-  border-radius: 4px; /* Square/Rectangular buttons look more "retail" than round */
+  border-radius: 4px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -78,18 +75,18 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .heroContainer {
-    height: 220px; /* Much smaller on mobile */
+    height: 220px; 
   }
   
   .overlay {
-    width: 100%; /* Full overlay on mobile to ensure text readablity */
+    width: 100%;
     background: rgba(0,0,0,0.4);
   }
 
   .contentWrapper {
     left: 20px;
     right: 20px;
-    text-align: center; /* Center on mobile */
+    text-align: center;
   }
 
   .title {
@@ -98,7 +95,7 @@
   
   .subTitle {
     font-size: 0.9rem;
-    display: none; /* Hide subtitle on very small screens to save space */
+    display: none;
   }
   
   .primaryBtn {

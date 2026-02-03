@@ -1,4 +1,3 @@
-import React from "react";
 import HeroSlider from "./HeroSlider";
 import { Link } from "react-router-dom";
 import styles from "./Hero.module.css";
