@@ -14,13 +14,57 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
     let isMounted = true; // Cleanup flag
 
     const fetchProductImage = async (id) => {
+      if (!id) {
+        if (isMounted) {
+          setIsLoading(false);
+          setError(true);
+        }
+        return;
+      }
+
       try {
         setIsLoading(true);
         setError(false);
         
-        const response = await fetch(
+        // 1. Try to fetch the image assuming 'id' is a direct Image ID
+        let response = await fetch(
           `${BASE_URL}/images/image/download/${id}`
         );
+
+        // 2. If 404 (Not Found), it likely means 'id' is a Product ID, not an Image ID.
+        // We need to fetch the Product Details to find the real Image ID.
+        if (response.status === 404) {
+          try {
+            // FIX: Updated endpoint to match productSlice.js structure
+            // Old (Broken): ${BASE_URL}/products/${id}
+            // New (Correct): ${BASE_URL}/products/product/${id}/product
+            const productResponse = await fetch(`${BASE_URL}/products/product/${id}/product`);
+            
+            if (productResponse.ok) {
+              const responseJson = await productResponse.json();
+              const productData = responseJson.data || responseJson; // Handle potential wrapper
+              
+              // Extract the first image ID
+              const realImageId = 
+                (productData.images && productData.images.length > 0 ? productData.images[0].id : null) || 
+                productData.productImage || 
+                productData.image;
+
+              if (realImageId) {
+                // Retry download with the correct Image ID
+                response = await fetch(`${BASE_URL}/images/image/download/${realImageId}`);
+              } else {
+                // No image found in product details
+                throw new Error("No image associated with this product");
+              }
+            } else {
+                console.warn(`Fallback fetch failed with status: ${productResponse.status}`);
+            }
+          } catch (innerErr) {
+            console.warn("Product fallback fetch failed:", innerErr);
+            // We don't throw here, we let the original response check below handle the failure
+          }
+        }
 
         if (!response.ok) {
           throw new Error("Failed to load image");
@@ -38,7 +82,10 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
         
         reader.readAsDataURL(blob);
       } catch (err) {
-        console.error("Error fetching image:", err);
+        // Only log errors if they aren't standard 404s to reduce console noise
+        if (err.message !== "Failed to load image") {
+             console.error("Error inside ProductImage:", err);
+        }
         if (isMounted) {
           setError(true);
           setIsLoading(false);
@@ -46,12 +93,7 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
       }
     };
 
-    if (productId) {
-      fetchProductImage(productId);
-    } else {
-      setIsLoading(false);
-      setError(true);
-    }
+    fetchProductImage(productId);
 
     return () => {
       isMounted = false;
@@ -62,7 +104,8 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
     return (
       <div className={styles.container}>
         <div className={styles.placeholder}>
-          <span>Loading...</span>
+          {/* Optional: Add a small spinner here */}
+          <span>...</span> 
         </div>
       </div>
     );
@@ -72,7 +115,7 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
     return (
       <div className={styles.container}>
         <div className={styles.placeholder}>
-          <span>No Image</span>
+          <span style={{fontSize: '0.8rem'}}>No Image</span>
         </div>
       </div>
     );

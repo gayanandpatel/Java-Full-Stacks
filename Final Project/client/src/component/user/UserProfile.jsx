@@ -368,8 +368,13 @@ const UserProfile = () => {
                         <div className={styles.itemsContainer}>
                           {Array.isArray(order.items) && order.items.map((item, i) => (
                             <div key={i} className={styles.itemRow}>
+                              {/* Inside your orders map loop in UserProfile.jsx */}
                               <div className={styles.itemImage}>
-                                <ProductImage productId={item.productId} />
+                                <ProductImage 
+                                  // This will now work even if it's a Product ID (like 31) because 
+                                  // the fallback URL is fixed.
+                                  productId={item.productId} 
+                                />
                               </div>
                               <div className={styles.itemDetails}>
                                 <Link to={`/product/${item.productId}/details`} className={styles.productLink}>
