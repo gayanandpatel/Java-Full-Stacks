@@ -1,11 +1,9 @@
-/* Footer.module.css */
-
 .footer {
-  background-color: #111111; /* Darker, more premium background */
-  color: #b0b0b0; /* Softer white for text prevents eye strain */
+  background-color: #111111; 
+  color: #b0b0b0; 
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   padding-top: 4rem;
-  margin-top: auto; /* Pushes footer to bottom if page content is short */
+  margin-top: auto; 
 }
 
 /* --- Top Newsletter Section --- */
@@ -80,7 +78,7 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr; /* Logo section is wider */
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
   gap: 40px;
   padding: 0 5% 3rem 5%;
 }
@@ -139,7 +137,7 @@
 
 .link:hover {
   color: var(--search-button-color, #c38212);
-  padding-left: 5px; /* Subtle movement effect */
+  padding-left: 5px; 
 }
 
 .contactItem {

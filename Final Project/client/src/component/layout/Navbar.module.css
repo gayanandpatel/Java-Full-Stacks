@@ -1,8 +1,5 @@
-/* NavBar.module.css */
-
-/* --- Layout & Background --- */
 .navbar {
-  background-color: #111111; /* Matches your new dark footer */
+  background-color: #111111;
   height: 80px;
   display: flex;
   justify-content: center;
@@ -36,7 +33,7 @@
 }
 
 .brandHighlight {
-  color: var(--search-button-color, #c38212); /* Uses your global orange */
+  color: var(--search-button-color, #c38212);
 }
 
 /* --- Desktop Navigation Links --- */
@@ -119,9 +116,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #111; /* Creates a cutout effect */
+  border: 2px solid #111; 
 }
-
 /* Profile Dropdown */
 .profileDropdown {
   position: relative;
@@ -246,12 +242,12 @@
     padding: 20px 0;
     gap: 0;
     border-top: 1px solid #222;
-    clip-path: circle(0% at 100% 0); /* Cool reveal animation start */
+    clip-path: circle(0% at 100% 0); 
     transition: clip-path 0.5s ease-in-out;
   }
 
   .navActive {
-    clip-path: circle(150% at 100% 0); /* Cool reveal animation end */
+    clip-path: circle(150% at 100% 0);
     box-shadow: 0 10px 10px rgba(0,0,0,0.2);
   }
 
@@ -271,11 +267,6 @@
   }
 
   .navLink::after {
-    display: none; /* Disable underline on mobile */
-  }
-
-  /* Adjust dropdown for mobile if needed, or hide it and show links directly */
-  .profileTrigger span, .profileTrigger svg {
-     /* Hide text on very small screens if crowded */
+    display: none;
   }
 }

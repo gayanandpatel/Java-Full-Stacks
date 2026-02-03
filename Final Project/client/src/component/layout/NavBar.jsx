@@ -1,25 +1,21 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserCart } from "../../store/features/cartSlice";
-import { logoutUser } from "../services/AuthService";
+import { logoutUser } from "../services/authService";
 
-// Icons
 import { FaShoppingCart, FaUser, FaChevronDown } from "react-icons/fa";
 
-// Styles
 import styles from "./NavBar.module.css";
 
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Redux
   const userRoles = useSelector((state) => state.auth.roles);
   const userId = localStorage.getItem("userId");
   const cart = useSelector((state) => state.cart);
@@ -46,7 +42,6 @@ const NavBar = () => {
     logoutUser();
     setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
-    // Optional: Refresh or navigate to login
     navigate("/login");
   };
 
@@ -58,12 +53,12 @@ const NavBar = () => {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         
-        {/* 1. Brand Logo */}
+        {/* Brand Logo */}
         <Link to="/" className={styles.brand}>
           Shop<span className={styles.brandHighlight}>ifyy</span>
         </Link>
 
-        {/* 2. Navigation Links (Desktop + Mobile) */}
+        {/* Navigation Links (Desktop + Mobile) */}
         <ul className={`${styles.navLinks} ${isMobileMenuOpen ? styles.navActive : ""}`}>
           <li className={styles.navItem}>
             <Link to="/products" className={styles.navLink} onClick={() => setIsMobileMenuOpen(false)}>
@@ -89,7 +84,7 @@ const NavBar = () => {
           )}
         </ul>
 
-        {/* 3. Right Side Actions */}
+        {/* Right Side Actions */}
         <div className={styles.navActions}>
           
           {/* Cart Icon */}
@@ -131,8 +126,6 @@ const NavBar = () => {
               </div>
             </div>
           ) : (
-            /* Login Button (Desktop) - hidden on mobile via CSS if needed, 
-               but here we keep it simple. Only shows if menu closed to avoid duplicates */
             !isMobileMenuOpen && (
               <Link to="/login" className={styles.navLink} style={{marginRight: '10px'}}>
                 Register/Login

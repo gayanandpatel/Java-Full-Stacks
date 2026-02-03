@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllCategories } from "../../store/features/categorySlice";
 
-// Icons
+
 import { 
   FaFacebookF, 
   FaTwitter, 
@@ -17,12 +17,11 @@ import {
   FaCcPaypal
 } from "react-icons/fa";
 
-// Import the CSS Module
+
 import styles from "./Footer.module.css";
 
 const Footer = () => {
   const dispatch = useDispatch();
-  // Safe access to categories in case state is empty initially
   const categories = useSelector((state) => state.category.categories) || [];
 
   useEffect(() => {
@@ -35,12 +34,12 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       
-      {/* 1. Newsletter Section - Modern Touch */}
+      {/* Newsletter Section - Modern Touch */}
       <div className={styles.newsletterSection}>
         <div className={styles.newsletterContent}>
           <div className={styles.newsletterText}>
             <h3>Join our newsletter</h3>
-            <p>We'll send you a nice letter once per week. No spam.</p>
+            <p>We&apos;ll send you a nice letter once per week. No spam.</p>
           </div>
           <form className={styles.newsletterForm} onSubmit={(e) => e.preventDefault()}>
             <input 
@@ -55,7 +54,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* 2. Main Grid Layout */}
+      {/* Main Grid Layout */}
       <div className={styles.mainContent}>
         
         {/* Brand Column */}
@@ -120,7 +119,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* 3. Bottom Bar with Payment Icons */}
+      {/* Bottom Bar with Payment Icons */}
       <div className={styles.bottomBar}>
         <div className={styles.bottomContent}>
           <p className={styles.copyright}>
