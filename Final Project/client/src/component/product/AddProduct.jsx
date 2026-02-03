@@ -1,21 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Stepper, Step, StepLabel } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import { addNewProduct } from "../../store/features/productSlice";
 
-// Child Components
+
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
 import ImageUploader from "../common/ImageUploader";
 
-// Import styles
+
 import styles from "./AddProduct.module.css";
 
 const AddProduct = () => {
   const dispatch = useDispatch();
   
-  // Local State
+ 
   const [showNewBrandInput, setShowNewBrandInput] = useState(false);
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newBrand, setNewBrand] = useState("");
@@ -34,7 +34,7 @@ const AddProduct = () => {
     inventory: "",
   });
 
-  // Handlers
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct((prevState) => ({
@@ -60,7 +60,7 @@ const AddProduct = () => {
       setProductId(result.id);
       toast.success("Product added successfully!");
       resetForm();
-      setActiveStep(1); // Move to Image Upload step
+      setActiveStep(1); 
     } catch (error) {
       toast.error(error.message || "Failed to add product");
     }
@@ -101,7 +101,7 @@ const AddProduct = () => {
           </Stepper>
         </div>
 
-        {/* STEP 1: Product Details Form */}
+        {/*Product Details Form */}
         {activeStep === 0 && (
           <form onSubmit={handleAddNewProduct} className={styles.form}>
             
@@ -120,7 +120,7 @@ const AddProduct = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="price" className={styles.label}>Price ($)</label>
+              <label htmlFor="price" className={styles.label}>Price (₹)</label>
               <input
                 className={styles.input}
                 type="number"

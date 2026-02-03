@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllBrands, addBrand } from "../../store/features/productSlice";
 
-// Import styles
 import styles from "./BrandSelector.module.css";
 
 const BrandSelector = ({
@@ -79,6 +79,15 @@ const BrandSelector = ({
       )}
     </div>
   );
+};
+
+BrandSelector.propTypes = {
+  selectedBrand: PropTypes.string,
+  onBrandChange: PropTypes.func.isRequired,
+  newBrand: PropTypes.string,
+  showNewBrandInput: PropTypes.bool,
+  setNewBrand: PropTypes.func.isRequired,
+  setShowNewBrandInput: PropTypes.func.isRequired,
 };
 
 export default BrandSelector;

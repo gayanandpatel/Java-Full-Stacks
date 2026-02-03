@@ -153,7 +153,7 @@ const ProductUpdate = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="price" className={styles.label}>Price ($)</label>
+              <label htmlFor="price" className={styles.label}>Price (₹)</label>
               <input
                 type="number"
                 className={styles.input}
