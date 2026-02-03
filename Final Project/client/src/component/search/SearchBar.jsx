@@ -1,31 +1,25 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaSearch, FaTimes, FaCaretDown } from "react-icons/fa";
 
-
-// Actions
 import { getAllCategories } from "../../store/features/categorySlice";
 import {
   setSearchQuery,
   setSelectedCategory,
   clearFilters,
 } from "../../store/features/searchSlice";
-
-// Import Styles
 import styles from "./SearchBar.module.css";
 
 const SearchBar = () => {
   const dispatch = useDispatch();
-  const { categoryId } = useParams();
-  const navigate = useNavigate(); // Kept for potential future use
+  const { categoryId } = useParams(); 
   
   const categories = useSelector((state) => state.category.categories);
   const { searchQuery, selectedCategory } = useSelector(
     (state) => state.search
   );
 
-  // Sync URL category with Redux state
   useEffect(() => {
     if (categoryId && categories.length > 0) {
       const currentCategory = categories.find(
@@ -46,7 +40,6 @@ const SearchBar = () => {
 
   const handleClearFilters = () => {
     dispatch(clearFilters());
-    // navigate("/products"); // Uncomment if you want to redirect on clear
   };
 
   const handleSearchQueryChange = (e) => {

@@ -1,14 +1,12 @@
-/* SearchBar.module.css */
-
 .container {
   display: flex;
   align-items: center;
   background-color: #ffffff;
-  border: 2px solid #e0e0e0; /* Thicker border for better visibility */
-  border-radius: 50px; /* Modern pill shape */
+  border: 2px solid #e0e0e0; 
+  border-radius: 50px; 
   padding: 4px;
   width: 100%;
-  max-width: 850px; /* Optimal reading width */
+  max-width: 850px; 
   margin: 0 auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -24,7 +22,7 @@
 .categoryWrapper {
   position: relative;
   border-right: 1px solid #e0e0e0;
-  display: flex; /* Ensures height matches content */
+  display: flex;
   align-items: center;
 }
 
@@ -32,7 +30,6 @@
   appearance: none;
   background-color: transparent;
   border: none;
-  /* Updated padding: increased right padding to 35px to make room for icon */
   padding: 12px 35px 12px 25px; 
   font-size: 0.9rem;
   font-weight: 500;
@@ -45,14 +42,13 @@
   text-overflow: ellipsis;
   border-radius: 50px 0 0 50px;
   transition: background-color 0.2s;
-  /* Ensure z-index is higher if needed, but usually fine as is */
 }
 .caretIcon {
   position: absolute;
   right: 12px;
   top: 50%;
-  transform: translateY(-50%); /* Centers vertically */
-  pointer-events: none; /* CRITICAL: Allows clicks to pass through to the select */
+  transform: translateY(-50%);
+  pointer-events: none; 
   color: #777;
   font-size: 0.8rem;
 }
@@ -75,7 +71,7 @@
   color: #333;
   outline: none;
   background: transparent;
-  min-width: 0; /* Prevents flex items from overflowing */
+  min-width: 0;
 }
 
 .input::placeholder {
@@ -106,7 +102,7 @@
 
 .clearBtn:hover {
   background-color: #fee2e2;
-  color: #dc2626; /* Red color for clear action */
+  color: #dc2626;
 }
 
 /* Search Icon (Visual Indicator) */
@@ -131,7 +127,7 @@
 /* Responsive Styles */
 @media (max-width: 600px) {
   .container {
-    border-radius: 12px; /* Less rounded on small screens to save space */
+    border-radius: 12px;
     flex-wrap: wrap;
     padding: 8px;
   }
