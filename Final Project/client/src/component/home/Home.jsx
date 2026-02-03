@@ -1,42 +1,36 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
-// Components
+
 import Hero from "../hero/Hero";
 import Paginator from "../common/Paginator";
 import ProductImage from "../utils/ProductImage";
 import LoadSpinner from "../common/LoadSpinner";
-// Removed StockStatus import as we are implementing custom logic inline
-// import StockStatus from "../utils/StockStatus";
 
-// State Actions
 import { setTotalItems } from "../../store/features/paginationSlice";
 import { getDistinctProductsByName } from "../../store/features/productSlice";
 import { resetSearchState } from "../../store/features/searchSlice"; 
 
-// Styling
 import styles from "./Home.module.css";
 
 const Home = () => {
   const dispatch = useDispatch();
   const [filteredProducts, setFilteredProducts] = useState([]);
   
-  // Redux Selectors
   const products = useSelector((state) => state.product.distinctProducts);
   const { searchQuery, selectedCategory } = useSelector((state) => state.search);
   const { itemsPerPage, currentPage } = useSelector((state) => state.pagination);
   const isLoading = useSelector((state) => state.product.isLoading);
 
-  // 1. Initial Fetch & Reset Filters
+  // Initial Fetch & Reset Filters
   useEffect(() => {
-    // Reset search filters so the homepage is always clean
     dispatch(resetSearchState());
     dispatch(getDistinctProductsByName());
   }, [dispatch]);
 
-  // 2. Filtering Logic (Client-side)
+  // Filtering Logic (Client-side)
   useEffect(() => {
     if (!products) return;
 
@@ -55,7 +49,7 @@ const Home = () => {
     setFilteredProducts(results);
   }, [searchQuery, selectedCategory, products]);
 
-  // 3. Pagination Logic
+  // Pagination Logic
   useEffect(() => {
     dispatch(setTotalItems(filteredProducts.length));
   }, [filteredProducts, dispatch]);
@@ -92,7 +86,7 @@ const Home = () => {
                style={{opacity: 0.5, marginBottom: '20px'}}
              />
              <h3>No products found.</h3>
-             <p className="text-muted">We couldn't find what you're looking for.</p>
+             <p className="text-muted">We couldn&apos;t find what you&apos;re looking for.</p>
              <button 
                 className={styles.resetBtn}
                 onClick={() => dispatch(resetSearchState())}
@@ -129,7 +123,7 @@ const Home = () => {
                       {product.description}
                     </p>
                     
-                    {/* Stock Status - FIXED: Shows text only (In Stock / Out of Stock) */}
+                    {/* Stock Status Shows text only (In Stock / Out of Stock) */}
                     <div className={styles.stockWrapper}>
                         {product.inventory > 0 ? (
                           <span style={{ color: "#28a745", fontWeight: "600", fontSize: "0.85rem" }}>
