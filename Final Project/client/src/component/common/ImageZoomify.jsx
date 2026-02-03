@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ImageZoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
+import PropTypes from "prop-types";
 
-// Import styles
 import styles from "./ImageZoomify.module.css";
 
 const ImageZoomify = ({ productId }) => {
@@ -16,7 +16,7 @@ const ImageZoomify = ({ productId }) => {
         const response = await fetch(
           `http://localhost:9090/api/v1/images/image/download/${id}`
         );
-        
+
         if (!response.ok) {
           throw new Error("Failed to load image");
         }
@@ -61,15 +61,19 @@ const ImageZoomify = ({ productId }) => {
     <div className={styles.container}>
       <div className={styles.zoomWrapper}>
         <ImageZoom>
-          <img 
-            src={productImg} 
-            alt="Product" 
-            className={styles.image} 
+          <img
+            src={productImg}
+            alt="Product"
+            className={styles.image}
           />
         </ImageZoom>
       </div>
     </div>
   );
+};
+
+ImageZoomify.propTypes = {
+  productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default ImageZoomify;
