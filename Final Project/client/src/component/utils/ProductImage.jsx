@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-// Import styles
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+
 import styles from "./ProductImage.module.css";
 
 const ProductImage = ({ productId, altText = "Product Image" }) => {
@@ -7,11 +8,16 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
+ProductImage.propTypes = {
+  productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  altText: PropTypes.string,
+};
+
   // Use env variable or fallback
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:9090/api/v1";
 
   useEffect(() => {
-    let isMounted = true; // Cleanup flag
+    let isMounted = true; 
 
     const fetchProductImage = async (id) => {
       if (!id) {
@@ -26,32 +32,29 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
         setIsLoading(true);
         setError(false);
         
-        // 1. Try to fetch the image assuming 'id' is a direct Image ID
+        // Try to fetch the image assuming 'id' is a direct Image ID
         let response = await fetch(
           `${BASE_URL}/images/image/download/${id}`
         );
 
-        // 2. If 404 (Not Found), it likely means 'id' is a Product ID, not an Image ID.
-        // We need to fetch the Product Details to find the real Image ID.
+        
         if (response.status === 404) {
           try {
-            // FIX: Updated endpoint to match productSlice.js structure
-            // Old (Broken): ${BASE_URL}/products/${id}
-            // New (Correct): ${BASE_URL}/products/product/${id}/product
+            
             const productResponse = await fetch(`${BASE_URL}/products/product/${id}/product`);
             
             if (productResponse.ok) {
               const responseJson = await productResponse.json();
-              const productData = responseJson.data || responseJson; // Handle potential wrapper
+              const productData = responseJson.data || responseJson;
               
-              // Extract the first image ID
+              
               const realImageId = 
                 (productData.images && productData.images.length > 0 ? productData.images[0].id : null) || 
                 productData.productImage || 
                 productData.image;
 
               if (realImageId) {
-                // Retry download with the correct Image ID
+                
                 response = await fetch(`${BASE_URL}/images/image/download/${realImageId}`);
               } else {
                 // No image found in product details
@@ -62,7 +65,7 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
             }
           } catch (innerErr) {
             console.warn("Product fallback fetch failed:", innerErr);
-            // We don't throw here, we let the original response check below handle the failure
+            
           }
         }
 
@@ -82,7 +85,7 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
         
         reader.readAsDataURL(blob);
       } catch (err) {
-        // Only log errors if they aren't standard 404s to reduce console noise
+        
         if (err.message !== "Failed to load image") {
              console.error("Error inside ProductImage:", err);
         }
@@ -104,7 +107,7 @@ const ProductImage = ({ productId, altText = "Product Image" }) => {
     return (
       <div className={styles.container}>
         <div className={styles.placeholder}>
-          {/* Optional: Add a small spinner here */}
+          
           <span>...</span> 
         </div>
       </div>
