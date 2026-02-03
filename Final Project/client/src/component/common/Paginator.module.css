@@ -1,5 +1,3 @@
-/* Paginator.module.css */
-
 .container {
   display: flex;
   justify-content: center;
@@ -47,7 +45,7 @@
   color: white;
 }
 
-/* Optional: Disabled state if you add Prev/Next buttons later */
+
 .disabled {
   opacity: 0.5;
   cursor: not-allowed;

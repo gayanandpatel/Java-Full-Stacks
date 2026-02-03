@@ -1,8 +1,6 @@
-import React from "react";
 import { setCurrentPage } from "../../store/features/paginationSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-// Import styles
 import styles from "./Paginator.module.css";
 
 const Paginator = () => {
@@ -30,9 +28,6 @@ const Paginator = () => {
 
   return (
     <div className={styles.container}>
-      {/* You can easily add Prev/Next buttons here if needed, 
-         but adhering to your original logic of just numbers for now.
-      */}
       
       {pageNumbers.map((number) => (
         <button
